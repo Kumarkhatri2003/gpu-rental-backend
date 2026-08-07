@@ -1,0 +1,19 @@
+# Version control
+.git
+.gitignore
+
+# Docker
+.dockerignore
+Dockerfile
+
+# Environment Variables
+.env
+.env.*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Any random scripts or logs
+*.log
+scratch/
