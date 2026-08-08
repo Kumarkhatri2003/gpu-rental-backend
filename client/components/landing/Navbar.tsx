@@ -40,8 +40,8 @@ export function Navbar() {
           >
             Login
           </Link>
-          <Link
-            href="/register/renter"
+          <Link 
+            href="/register"
             className="hidden md:inline-flex h-9 items-center justify-center rounded-md bg-[#2B55E8] px-5 text-[14px] font-medium text-white transition-all hover:bg-[#315FFF] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(43,85,232,0.24)]"
           >
             Get Started

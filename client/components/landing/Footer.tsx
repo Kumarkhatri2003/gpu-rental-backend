@@ -42,7 +42,7 @@ export function Footer() {
             <h4 className="font-bold mb-4 text-white text-[15px]">Account</h4>
             <ul className="space-y-3 text-[14px] text-[#a1a1aa]">
               <li><Link href="/login" className="hover:text-white transition-colors">Login</Link></li>
-              <li><Link href="/register/renter" className="hover:text-white transition-colors">Register</Link></li>
+              <li><Link href="/register" className="hover:text-white transition-colors">Register</Link></li>
             </ul>
           </div>
 
