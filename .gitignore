@@ -28,3 +28,11 @@ logs/
 
 # Miscellaneous
 scratch/
+
+# Python/Django ignores
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+
