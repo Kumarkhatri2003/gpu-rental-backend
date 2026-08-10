@@ -39,3 +39,29 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// --- API Methods ---
+// These are currently mocked, wait for backend implementation to replace them with actual Axios calls.
+import { mockWalletData, mockSessions, mockGpuList, delay } from "./mockData";
+
+export const getDashboardStats = async () => {
+  await delay(500); // Simulate network
+  return {
+    // We can add global stats if supported later. For now relying on sessions.
+  };
+};
+
+export const getWalletBalance = async () => {
+  await delay(500);
+  return mockWalletData;
+};
+
+export const getSessions = async () => {
+  await delay(500);
+  return mockSessions;
+};
+
+export const getAvailableGpus = async () => {
+  await delay(500);
+  return mockGpuList.filter(gpu => gpu.status === "available");
+};

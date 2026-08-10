@@ -28,6 +28,6 @@ export interface Session {
   gpuId: string;
   startTime: string;
   endTime: string | null;
-  status: "active" | "completed" | "cancelled";
+  status: "active" | "completed" | "cancelled" | "pending" | "failed";
   totalCost: number | null;
 }
