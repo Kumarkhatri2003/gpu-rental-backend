@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -140,6 +141,15 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# Swagger UI / OpenAPI Settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'SSH-Based GPU Resource Provisioning API',
+    'DESCRIPTION': 'API documentation for the GPU Renting and SSH Provisioning Platform.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
 
 # Simple JWT Configuration
