@@ -1,23 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
+
+function useIsMounted() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+}
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
+  const isMounted = useIsMounted();
 
   useEffect(() => {
-    setMounted(true);
-    if (!isAuthenticated) {
+    if (isMounted && !isAuthenticated) {
       router.push("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [isMounted, isAuthenticated, router]);
 
-  if (!mounted || !isAuthenticated) {
-    return null; // or a loading spinner
+  if (!isMounted || !isAuthenticated) {
+    return null;
   }
 
   return <>{children}</>;

@@ -11,7 +11,7 @@ import { Eye, EyeOff, Check, ArrowRight, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 // Mock API submission
-const mockRegisterUser = async (data: any) => {
+const mockRegisterUser = async (): Promise<{ success: boolean }> => {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({ success: true });
@@ -175,14 +175,14 @@ export default function RegisterPage() {
       };
       
       console.log("Submitting registration:", payload);
-      const res = await mockRegisterUser(payload);
+      const res = await mockRegisterUser();
       
-      if ((res as any).success) {
+      if (res.success) {
         // Clear sensitive data
         setFormData(prev => ({ ...prev, password: "", confirmPassword: "" }));
         setStep(5); // Success step
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred during registration. Please try again.");
     } finally {
       setIsLoading(false);
@@ -237,7 +237,7 @@ export default function RegisterPage() {
           {step === 1 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div>
-                <h1 className="text-2xl font-semibold tracking-tight">Let's get started</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">Let&apos;s get started</h1>
                 <p className="text-sm text-muted-foreground mt-1">What should we call you?</p>
               </div>
               
@@ -282,7 +282,7 @@ export default function RegisterPage() {
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div>
                 <h1 className="text-2xl font-semibold tracking-tight">Your email</h1>
-                <p className="text-sm text-muted-foreground mt-1">We'll use this for your account</p>
+                <p className="text-sm text-muted-foreground mt-1">We&apos;ll use this for your account</p>
               </div>
               
               <div className="space-y-4">

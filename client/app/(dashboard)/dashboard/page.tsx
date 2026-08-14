@@ -21,39 +21,70 @@ export default function DashboardPage() {
   const [availableGpus, setAvailableGpus] = useState<GPU[]>([]);
   const [gpusDict, setGpusDict] = useState<Record<string, GPU>>({});
 
-  const fetchData = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      const [walletData, sessionsData, gpusData] = await Promise.all([
-        getWalletBalance(),
-        getSessions(),
-        getAvailableGpus()
-      ]);
-      
-      setWallet(walletData);
-      setSessions(sessionsData);
-      setAvailableGpus(gpusData.slice(0, 3)); // Only take up to 3 for preview
-      
-      // Create a dictionary of all GPUs to easily look up names for sessions
-      const dict: Record<string, GPU> = {};
-      gpusData.forEach(g => dict[g.id] = g);
-      
-      if (!dict["gpu-1"]) dict["gpu-1"] = { ...gpusData[0], id: "gpu-1", model: "RTX 4090" };
-      if (!dict["gpu-2"]) dict["gpu-2"] = { ...gpusData[0], id: "gpu-2", model: "RTX 3090" };
-      
-      setGpusDict(dict);
-    } catch (err) {
-      console.error("Dashboard fetch error:", err);
-      setError("Something went wrong while retrieving your compute information.");
-    } finally {
-      setIsLoading(false);
-    }
+  const fetchData = () => {
+    setIsLoading(true);
+    setError(null);
+    
+    Promise.all([
+      getWalletBalance(),
+      getSessions(),
+      getAvailableGpus()
+    ])
+      .then(([walletData, sessionsData, gpusData]) => {
+        setWallet(walletData);
+        setSessions(sessionsData);
+        setAvailableGpus(gpusData.slice(0, 3));
+
+        const dict: Record<string, GPU> = {};
+        gpusData.forEach(g => dict[g.id] = g);
+        
+        if (!dict["gpu-1"]) dict["gpu-1"] = { ...gpusData[0], id: "gpu-1", model: "RTX 4090" };
+        if (!dict["gpu-2"]) dict["gpu-2"] = { ...gpusData[0], id: "gpu-2", model: "RTX 3090" };
+        
+        setGpusDict(dict);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error("Dashboard fetch error:", err);
+        setError("Something went wrong while retrieving your compute information.");
+        setIsLoading(false);
+      });
   };
 
   useEffect(() => {
-    fetchData();
+    let isMounted = true;
+    Promise.all([
+      getWalletBalance(),
+      getSessions(),
+      getAvailableGpus()
+    ])
+      .then(([walletData, sessionsData, gpusData]) => {
+        if (isMounted) {
+          setWallet(walletData);
+          setSessions(sessionsData);
+          setAvailableGpus(gpusData.slice(0, 3));
+
+          const dict: Record<string, GPU> = {};
+          gpusData.forEach(g => dict[g.id] = g);
+          
+          if (!dict["gpu-1"]) dict["gpu-1"] = { ...gpusData[0], id: "gpu-1", model: "RTX 4090" };
+          if (!dict["gpu-2"]) dict["gpu-2"] = { ...gpusData[0], id: "gpu-2", model: "RTX 3090" };
+          
+          setGpusDict(dict);
+          setIsLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (isMounted) {
+          console.error("Dashboard fetch error:", err);
+          setError("Something went wrong while retrieving your compute information.");
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   if (isLoading) {
