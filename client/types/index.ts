@@ -14,20 +14,19 @@ export interface GPU {
   vram: number;
   pricePerHour: number;
   status: "available" | "rented" | "offline";
-  specs: {
-    cudaCores: number;
-    memoryType: string;
-    pcieGen: string;
+  specs?: {
+    cudaCores?: number;
+    memoryType?: string;
+    pcieGen?: string;
   };
-  createdAt: string;
+  location?: string;
+  createdAt?: string;
 }
 
-export interface Session {
-  id: string;
-  renterId: string;
-  gpuId: string;
-  startTime: string;
-  endTime: string | null;
-  status: "active" | "completed" | "cancelled";
-  totalCost: number | null;
-}
+export * from "./gpu";
+export * from "./session";
+export * from "./wallet";
+export * from "./user";
+
+
+
