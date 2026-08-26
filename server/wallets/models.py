@@ -29,7 +29,7 @@ class Wallet(models.Model):
     
     class Meta:
         db_table = 'wallets'
-        odering = ['-created_at']
+        ordering = ['-created_at']
         
     def __str__(self):
         return f"{self.user.email} - {self.balance} {self.currency}" 
