@@ -1,103 +1,143 @@
 import * as React from "react"
-
+import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
-function Card({
-  className,
-  size = "default",
-  ...props
-}: React.ComponentProps<"div"> & { size?: "default" | "sm" }) {
-  return (
-    <div
-      data-slot="card"
-      data-size={size}
-      className={cn(
-        "group/card flex flex-col gap-(--card-spacing) overflow-hidden rounded-xl bg-card py-(--card-spacing) text-sm text-card-foreground ring-1 ring-foreground/10 [--card-spacing:--spacing(4)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:[--card-spacing:--spacing(3)] data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
-        className
-      )}
-      {...props}
-    />
-  )
-}
+const cardVariants = cva(
+  "rounded-2xl transition-all duration-200 text-card-foreground",
+  {
+    variants: {
+      variant: {
+        default: "border border-border bg-card shadow-corporate",
+        transparent: "border border-border/50 bg-transparent shadow-none",
+        secondary: "border border-border/60 bg-secondary/40 shadow-xs",
+        tertiary:
+          "border border-primary/25 bg-gradient-to-br from-indigo-500/5 via-violet-500/5 to-transparent shadow-sm",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
 
-function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
+export interface CardProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof cardVariants> {}
+
+const CardRoot = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, variant = "default", ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        data-slot="card"
+        className={cn(cardVariants({ variant }), className)}
+        {...props}
+      />
+    )
+  }
+)
+CardRoot.displayName = "Card"
+
+const CardHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
   return (
     <div
+      ref={ref}
       data-slot="card-header"
-      className={cn(
-        "group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-(--card-spacing) has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-(--card-spacing)",
-        className
-      )}
+      className={cn("flex flex-col space-y-1.5 p-6", className)}
       {...props}
     />
   )
-}
+})
+CardHeader.displayName = "CardHeader"
 
-function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
+const CardTitle = React.forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => {
   return (
-    <div
+    <h3
+      ref={ref}
       data-slot="card-title"
       className={cn(
-        "font-heading text-base leading-snug font-medium group-data-[size=sm]/card:text-sm",
+        "font-bold text-lg leading-none tracking-tight text-foreground",
         className
       )}
       {...props}
     />
   )
-}
+})
+CardTitle.displayName = "CardTitle"
 
-function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
+const CardDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => {
   return (
-    <div
+    <p
+      ref={ref}
       data-slot="card-description"
-      className={cn("text-sm text-muted-foreground", className)}
+      className={cn("text-xs text-muted-foreground leading-relaxed", className)}
       {...props}
     />
   )
-}
+})
+CardDescription.displayName = "CardDescription"
 
-function CardAction({ className, ...props }: React.ComponentProps<"div">) {
+const CardContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
   return (
     <div
-      data-slot="card-action"
-      className={cn(
-        "col-start-2 row-span-2 row-start-1 self-start justify-self-end",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-function CardContent({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
+      ref={ref}
       data-slot="card-content"
-      className={cn("px-(--card-spacing)", className)}
+      className={cn("p-6 pt-0", className)}
       {...props}
     />
   )
-}
+})
+CardContent.displayName = "CardContent"
 
-function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
+const CardFooter = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
   return (
     <div
+      ref={ref}
       data-slot="card-footer"
-      className={cn(
-        "flex items-center rounded-b-xl border-t bg-muted/50 p-(--card-spacing)",
-        className
-      )}
+      className={cn("flex items-center p-6 pt-0", className)}
       {...props}
     />
   )
+})
+CardFooter.displayName = "CardFooter"
+
+// Dot notation attachment for HeroUI Card patterns: <Card.Header />, <Card.Content />, etc.
+type CardComponent = typeof CardRoot & {
+  Header: typeof CardHeader
+  Title: typeof CardTitle
+  Description: typeof CardDescription
+  Content: typeof CardContent
+  Footer: typeof CardFooter
 }
+
+const Card = CardRoot as CardComponent
+Card.Header = CardHeader
+Card.Title = CardTitle
+Card.Description = CardDescription
+Card.Content = CardContent
+Card.Footer = CardFooter
 
 export {
   Card,
   CardHeader,
   CardFooter,
   CardTitle,
-  CardAction,
   CardDescription,
   CardContent,
+  cardVariants,
 }

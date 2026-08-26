@@ -1,39 +1,41 @@
 import React from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card } from "@/components/ui/card";
 
 export function GpuCardSkeleton() {
   return (
-    <div className="flex flex-col justify-between rounded-xl border border-white/10 bg-[#121212] p-5">
+    <Card className="flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-corporate animate-pulse">
       <div>
         {/* Header Skeleton */}
         <div className="flex items-start justify-between gap-3 mb-4">
           <div className="flex items-center gap-2.5 flex-1">
-            <div className="w-8 h-8 rounded-lg bg-zinc-800 animate-pulse shrink-0" />
-            <div className="h-5 w-32 bg-zinc-800 rounded animate-pulse" />
+            <Skeleton className="w-8 h-8 rounded-xl bg-muted/60 shrink-0" />
+            <Skeleton className="h-5 w-32 bg-muted/70 rounded-md" />
           </div>
-          <div className="h-6 w-20 bg-zinc-800 rounded-full animate-pulse" />
+          <Skeleton className="h-6 w-20 bg-muted/50 rounded-full" />
         </div>
 
         {/* Specs Skeleton */}
-        <div className="space-y-2.5 py-3 border-t border-b border-white/5 my-3">
+        <div className="space-y-2.5 py-3 border-t border-b border-border/60 my-3">
           <div className="flex items-center justify-between">
-            <div className="h-4 w-12 bg-zinc-800/70 rounded animate-pulse" />
-            <div className="h-4 w-20 bg-zinc-800/70 rounded animate-pulse" />
+            <Skeleton className="h-4 w-12 bg-muted/40 rounded" />
+            <Skeleton className="h-4 w-20 bg-muted/60 rounded" />
           </div>
           <div className="flex items-center justify-between">
-            <div className="h-4 w-16 bg-zinc-800/70 rounded animate-pulse" />
-            <div className="h-4 w-24 bg-zinc-800/70 rounded animate-pulse" />
+            <Skeleton className="h-4 w-16 bg-muted/40 rounded" />
+            <Skeleton className="h-4 w-24 bg-muted/60 rounded" />
           </div>
         </div>
 
         {/* Price Skeleton */}
         <div className="flex items-baseline justify-between pt-1 pb-4">
-          <div className="h-4 w-10 bg-zinc-800/70 rounded animate-pulse" />
-          <div className="h-7 w-28 bg-zinc-800 rounded animate-pulse" />
+          <Skeleton className="h-4 w-16 bg-muted/40 rounded" />
+          <Skeleton className="h-7 w-28 bg-muted/70 rounded-md" />
         </div>
       </div>
 
       {/* Button Skeleton */}
-      <div className="w-full h-10 rounded-lg bg-zinc-800 animate-pulse" />
-    </div>
+      <Skeleton className="w-full h-9 rounded-lg bg-muted/60" />
+    </Card>
   );
 }

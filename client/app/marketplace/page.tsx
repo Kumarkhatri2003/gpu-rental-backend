@@ -17,6 +17,7 @@ import { getGPUs } from "@/services/api";
 import { MarketplaceGPU, GpuFilters, SortOption } from "@/types/gpu";
 import { useAuthStore } from "@/stores/auth-store";
 import { X, SlidersHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 function useIsMounted() {
   return useSyncExternalStore(
@@ -274,7 +275,7 @@ function MarketplaceContent() {
 
   // Core Marketplace Body
   const marketplaceBody = (
-    <div className="flex flex-col gap-6 max-w-7xl mx-auto w-full">
+    <div className="flex flex-col gap-6 max-w-7xl mx-auto w-full pb-12">
       {/* Header */}
       <MarketplaceHeader />
 
@@ -289,20 +290,21 @@ function MarketplaceContent() {
 
         <div className="flex items-center gap-2.5 shrink-0 justify-between sm:justify-end">
           {/* Mobile Filter Sheet Trigger Button */}
-          <button
-            type="button"
-            onClick={() => setIsMobileFiltersOpen(true)}
-            className="lg:hidden flex items-center gap-2 h-11 px-4 rounded-lg bg-[#121212] border border-white/10 text-sm font-medium text-white hover:border-white/20 transition-all cursor-pointer"
+          <Button
+            variant="outline"
+            size="md"
+            onPress={() => setIsMobileFiltersOpen(true)}
+            className="lg:hidden flex items-center gap-2"
             aria-label="Open filter options"
           >
-            <SlidersHorizontal className="w-4 h-4 text-[#2B55E8]" />
+            <SlidersHorizontal className="w-4 h-4 text-primary" />
             <span>Filters</span>
             {activeFilterCount > 0 && (
-              <span className="w-5 h-5 rounded-full bg-[#2B55E8] text-[11px] font-bold flex items-center justify-center text-white">
+              <span className="w-5 h-5 rounded-full bg-primary text-[11px] font-bold flex items-center justify-center text-primary-foreground">
                 {activeFilterCount}
               </span>
             )}
-          </button>
+          </Button>
 
           <GpuSort value={sort} onChange={handleSortChange} />
         </div>
@@ -311,17 +313,17 @@ function MarketplaceContent() {
       {/* Active Filter Chips / Pills */}
       {hasActiveFilters && (
         <div className="flex flex-wrap items-center gap-2 pt-1">
-          <span className="text-xs text-zinc-400 font-medium mr-1">
+          <span className="text-xs text-muted-foreground font-semibold mr-1">
             Active filters:
           </span>
 
           {filters.search.trim() && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#1a1a1a] border border-white/15 text-white">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-secondary text-foreground border border-border">
               Search: &quot;{filters.search}&quot;
               <button
                 type="button"
                 onClick={() => handleFilterChange({ ...filters, search: "" })}
-                className="hover:text-red-400 transition-colors cursor-pointer"
+                className="hover:text-destructive transition-colors cursor-pointer"
                 aria-label="Remove search filter"
               >
                 <X className="w-3 h-3" />
@@ -332,7 +334,7 @@ function MarketplaceContent() {
           {filters.models.map((model) => (
             <span
               key={model}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#2B55E8]/15 border border-[#2B55E8]/30 text-[#a8bbff]"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-primary/10 border border-primary/30 text-primary"
             >
               {model}
               <button
@@ -343,7 +345,7 @@ function MarketplaceContent() {
                     models: filters.models.filter((m) => m !== model),
                   })
                 }
-                className="hover:text-white transition-colors cursor-pointer"
+                className="hover:text-foreground transition-colors cursor-pointer"
                 aria-label={`Remove ${model} filter`}
               >
                 <X className="w-3 h-3" />
@@ -352,12 +354,12 @@ function MarketplaceContent() {
           ))}
 
           {filters.minVram !== null && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#1a1a1a] border border-white/15 text-white">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-secondary text-foreground border border-border">
               ≥ {filters.minVram} GB VRAM
               <button
                 type="button"
                 onClick={() => handleFilterChange({ ...filters, minVram: null })}
-                className="hover:text-red-400 transition-colors cursor-pointer"
+                className="hover:text-destructive transition-colors cursor-pointer"
                 aria-label="Remove VRAM filter"
               >
                 <X className="w-3 h-3" />
@@ -366,7 +368,7 @@ function MarketplaceContent() {
           )}
 
           {(filters.minPrice !== null || filters.maxPrice !== null) && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#1a1a1a] border border-white/15 text-white">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-secondary text-foreground border border-border">
               NPR {filters.minPrice ?? 0} - {filters.maxPrice !== null ? `NPR ${filters.maxPrice}` : "Any"}
               <button
                 type="button"
@@ -377,7 +379,7 @@ function MarketplaceContent() {
                     maxPrice: null,
                   })
                 }
-                className="hover:text-red-400 transition-colors cursor-pointer"
+                className="hover:text-destructive transition-colors cursor-pointer"
                 aria-label="Remove price filter"
               >
                 <X className="w-3 h-3" />
@@ -388,7 +390,7 @@ function MarketplaceContent() {
           {filters.locations.map((loc) => (
             <span
               key={loc}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#1a1a1a] border border-white/15 text-white"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-secondary text-foreground border border-border"
             >
               {loc}
               <button
@@ -399,7 +401,7 @@ function MarketplaceContent() {
                     locations: filters.locations.filter((l) => l !== loc),
                   })
                 }
-                className="hover:text-red-400 transition-colors cursor-pointer"
+                className="hover:text-destructive transition-colors cursor-pointer"
                 aria-label={`Remove ${loc} filter`}
               >
                 <X className="w-3 h-3" />
@@ -408,12 +410,12 @@ function MarketplaceContent() {
           ))}
 
           {filters.availableOnly && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/15 border border-emerald-500/30 text-emerald-400">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
               Available Only
               <button
                 type="button"
                 onClick={() => handleFilterChange({ ...filters, availableOnly: false })}
-                className="hover:text-white transition-colors cursor-pointer"
+                className="hover:text-foreground transition-colors cursor-pointer"
                 aria-label="Remove available only filter"
               >
                 <X className="w-3 h-3" />
@@ -421,13 +423,14 @@ function MarketplaceContent() {
             </span>
           )}
 
-          <button
-            type="button"
-            onClick={handleResetFilters}
-            className="text-xs text-[#2B55E8] hover:text-[#315FFF] underline font-medium ml-1 cursor-pointer"
+          <Button
+            variant="link"
+            size="xs"
+            onPress={handleResetFilters}
+            className="text-xs text-primary font-semibold ml-1 p-0 h-auto"
           >
             Clear all
-          </button>
+          </Button>
         </div>
       )}
 
@@ -449,8 +452,8 @@ function MarketplaceContent() {
         <section className="lg:col-span-3 flex flex-col gap-4">
           {/* Results Count Header */}
           {!isLoading && !error && (
-            <div className="flex items-center justify-between text-xs text-zinc-400 pb-1">
-              <span className="font-semibold text-zinc-300">
+            <div className="flex items-center justify-between text-xs text-muted-foreground pb-1">
+              <span className="font-semibold text-foreground">
                 {filteredAndSortedGpus.length}{" "}
                 {filteredAndSortedGpus.length === 1 ? "GPU" : "GPUs"} available
               </span>
@@ -488,21 +491,22 @@ function MarketplaceContent() {
 
       {/* Mobile Filter Drawer / Modal */}
       {isMobileFiltersOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-200">
-          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl border border-white/15 bg-[#121212] p-5 shadow-2xl">
-            <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/60 backdrop-blur-sm p-0 sm:p-4 animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-2xl border border-border bg-card p-5 shadow-2xl">
+            <div className="flex items-center justify-between pb-4 border-b border-border mb-4">
               <div className="flex items-center gap-2">
-                <SlidersHorizontal className="w-5 h-5 text-[#2B55E8]" />
-                <h3 className="font-bold text-base text-white">Filter GPUs</h3>
+                <SlidersHorizontal className="w-5 h-5 text-primary" />
+                <h3 className="font-bold text-base text-foreground">Filter GPUs</h3>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsMobileFiltersOpen(false)}
-                className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
+              <Button
+                variant="ghost"
+                size="sm"
+                isIconOnly
+                onPress={() => setIsMobileFiltersOpen(false)}
                 aria-label="Close filter options"
               >
                 <X className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
 
             <GpuFiltersPanel
@@ -512,26 +516,26 @@ function MarketplaceContent() {
               availableModels={availableModels}
               availableLocations={availableLocations}
               hasActiveFilters={hasActiveFilters}
-              className="border-0 p-0 bg-transparent"
+              className="border-0 p-0 bg-transparent shadow-none"
             />
 
-            <div className="mt-6 pt-4 border-t border-white/10 flex gap-3">
+            <div className="mt-6 pt-4 border-t border-border flex gap-3">
               {hasActiveFilters && (
-                <button
-                  type="button"
-                  onClick={handleResetFilters}
-                  className="flex-1 h-11 rounded-lg border border-white/15 text-sm font-semibold text-zinc-300 hover:bg-white/5 transition-all"
+                <Button
+                  variant="tertiary"
+                  onPress={handleResetFilters}
+                  className="flex-1 font-semibold"
                 >
                   Reset
-                </button>
+                </Button>
               )}
-              <button
-                type="button"
-                onClick={() => setIsMobileFiltersOpen(false)}
-                className="flex-1 h-11 rounded-lg bg-[#2B55E8] text-sm font-semibold text-white hover:bg-[#315FFF] transition-all shadow-[0_4px_16px_rgba(43,85,232,0.3)]"
+              <Button
+                variant="primary"
+                onPress={() => setIsMobileFiltersOpen(false)}
+                className="flex-1 font-semibold"
               >
                 Show Results
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -546,7 +550,7 @@ function MarketplaceContent() {
 
   // Public / Guest Mode: Render with Website Navbar and Footer
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-[#000000] text-white selection:bg-[#2B55E8]/30">
+    <div className="min-h-screen flex flex-col font-sans bg-background text-foreground">
       <Navbar />
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-10 py-8">
         {marketplaceBody}
@@ -560,10 +564,10 @@ export default function MarketplacePage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#000000] flex items-center justify-center text-zinc-400">
+        <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 rounded-full border-2 border-[#2B55E8] border-t-transparent animate-spin" />
-            <p className="text-sm">Loading GPU Marketplace...</p>
+            <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+            <p className="text-sm font-medium">Loading GPU Marketplace...</p>
           </div>
         </div>
       }

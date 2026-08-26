@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 interface StatCardProps {
@@ -12,37 +12,27 @@ interface StatCardProps {
 export function StatCard({ label, value, sub, accent, warn }: StatCardProps) {
   return (
     <Card 
+      variant={accent ? "tertiary" : "default"}
       className={cn(
-        "relative overflow-hidden bg-card border-border",
-        accent && "border-primary/30",
-        warn && "border-destructive/30"
+        "relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5",
+        warn && "border-destructive/40 bg-gradient-to-br from-card via-card to-destructive/5"
       )}
     >
-      {accent && (
-        <div 
-          className="absolute inset-0 pointer-events-none opacity-10 bg-gradient-to-br from-primary to-transparent" 
-        />
-      )}
-      {warn && (
-        <div 
-          className="absolute inset-0 pointer-events-none opacity-10 bg-gradient-to-br from-destructive to-transparent" 
-        />
-      )}
-      <CardContent className="p-5 flex flex-col gap-1 relative z-10">
-        <p className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground">
+      <Card.Content className="p-5 sm:p-6 flex flex-col gap-1.5 relative z-10">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
           {label}
         </p>
         <p className={cn(
-          "text-2xl font-semibold leading-none text-foreground",
+          "text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-foreground",
           accent && "text-primary",
           warn && "text-destructive"
         )}>
           {value}
         </p>
         {sub && (
-          <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>
+          <p className="text-xs text-muted-foreground mt-0.5 leading-normal">{sub}</p>
         )}
-      </CardContent>
+      </Card.Content>
     </Card>
   );
 }

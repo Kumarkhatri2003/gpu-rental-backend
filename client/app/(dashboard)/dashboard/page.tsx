@@ -8,15 +8,14 @@ import { RecentSessions } from "@/components/dashboard/recent-sessions";
 import { AvailableGpus } from "@/components/dashboard/available-gpus";
 import { DashboardSkeleton } from "@/components/dashboard/dashboard-skeleton";
 import { getWalletBalance, getSessions, getAvailableGpus } from "@/services/api";
-import { WalletData } from "@/services/mockData";
-import { Session, GPU } from "@/types";
+import { Session, GPU, Wallet } from "@/types";
 import { Button } from "@/components/ui/button";
 
 export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const [wallet, setWallet] = useState<WalletData | null>(null);
+  const [wallet, setWallet] = useState<Wallet | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [availableGpus, setAvailableGpus] = useState<GPU[]>([]);
   const [gpusDict, setGpusDict] = useState<Record<string, GPU>>({});

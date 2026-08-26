@@ -15,11 +15,12 @@ export function DashboardHeader() {
 
   return (
     <div className="mb-2">
-      <h1 className="text-2xl font-semibold text-foreground">
-        {getGreeting()}, {firstName}<span className="text-primary">.</span>
+      <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+        {getGreeting()}, {firstName}
+        <span className="text-primary font-black">.</span>
       </h1>
-      <p className="text-sm text-muted-foreground mt-1">
-        Here&apos;s your compute overview.
+      <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+        Here&apos;s your compute overview and active GPU resources.
       </p>
     </div>
   );

@@ -46,15 +46,8 @@ export const getDashboardStats = async () => {
   };
 };
 
-export const getWalletBalance = async () => {
-  await delay(500);
-  return mockWalletData;
-};
-
-export const getSessions = async () => {
-  await delay(500);
-  return mockSessions;
-};
+export { getWalletBalance, depositFunds, getWalletTransactions } from "./wallet";
+export { getSessions, stopSession, getSessionById } from "./sessions";
 
 export const getAvailableGpus = async () => {
   await delay(500);

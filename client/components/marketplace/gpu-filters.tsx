@@ -3,6 +3,8 @@
 import React from "react";
 import { Filter, RotateCcw, Check } from "lucide-react";
 import { GpuFilters } from "@/types/gpu";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 export interface ModelCount {
   name: string;
@@ -61,13 +63,16 @@ export function GpuFiltersPanel({
 
   return (
     <div
-      className={`flex flex-col gap-6 rounded-xl border border-white/10 bg-[#121212] p-5 ${className}`}
+      className={cn(
+        "flex flex-col gap-6 rounded-2xl border border-border bg-card p-5 shadow-corporate",
+        className
+      )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-white/10">
+      <div className="flex items-center justify-between pb-4 border-b border-border/60">
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-[#2B55E8]" />
-          <h2 className="font-bold text-sm text-white tracking-wide uppercase">
+          <Filter className="w-4 h-4 text-primary" />
+          <h2 className="font-bold text-xs text-foreground tracking-wider uppercase">
             Filters
           </h2>
         </div>
@@ -75,7 +80,7 @@ export function GpuFiltersPanel({
           <button
             type="button"
             onClick={onReset}
-            className="flex items-center gap-1 text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer"
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer font-medium"
           >
             <RotateCcw className="w-3 h-3" />
             Reset all
@@ -85,11 +90,11 @@ export function GpuFiltersPanel({
 
       {/* 1. GPU Model Filter */}
       {availableModels.length > 0 && (
-        <div className="space-y-3">
-          <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+        <div className="space-y-2.5">
+          <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             GPU Model
           </label>
-          <div className="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-1">
+          <div className="flex flex-col gap-1 max-h-48 overflow-y-auto pr-1">
             {availableModels.map(({ name, count }) => {
               const isSelected = filters.models.includes(name);
               return (
@@ -97,25 +102,27 @@ export function GpuFiltersPanel({
                   key={name}
                   type="button"
                   onClick={() => toggleModel(name)}
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all text-left ${
+                  className={cn(
+                    "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all text-left cursor-pointer",
                     isSelected
-                      ? "bg-[#2B55E8]/20 text-white border border-[#2B55E8]/40"
-                      : "text-zinc-300 hover:bg-white/5 border border-transparent"
-                  }`}
+                      ? "bg-primary/10 text-primary border border-primary/30 font-semibold"
+                      : "text-foreground hover:bg-secondary/60 border border-transparent"
+                  )}
                 >
-                  <div className="flex items-center gap-2 truncate mr-2">
+                  <div className="flex items-center gap-2.5 truncate mr-2">
                     <div
-                      className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors ${
+                      className={cn(
+                        "w-4 h-4 rounded-md border flex items-center justify-center transition-colors shrink-0",
                         isSelected
-                          ? "bg-[#2B55E8] border-[#2B55E8] text-white"
-                          : "border-zinc-600 bg-transparent"
-                      }`}
+                          ? "bg-primary border-primary text-primary-foreground"
+                          : "border-input bg-card"
+                      )}
                     >
                       {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                     </div>
                     <span className="truncate">{name}</span>
                   </div>
-                  <span className="text-[11px] text-zinc-400 shrink-0 font-mono">
+                  <span className="text-[11px] text-muted-foreground shrink-0 font-mono font-medium">
                     {count}
                   </span>
                 </button>
@@ -126,8 +133,8 @@ export function GpuFiltersPanel({
       )}
 
       {/* 2. VRAM Filter */}
-      <div className="space-y-3">
-        <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+      <div className="space-y-2.5">
+        <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
           VRAM Memory
         </label>
         <div className="grid grid-cols-2 gap-1.5">
@@ -146,11 +153,12 @@ export function GpuFiltersPanel({
                     minVram: opt.value === filters.minVram ? null : opt.value,
                   })
                 }
-                className={`px-2.5 py-1.5 rounded-lg text-xs font-medium text-center transition-all ${
+                className={cn(
+                  "px-2.5 py-1.5 rounded-lg text-xs font-medium text-center transition-all cursor-pointer",
                   isSelected
-                    ? "bg-[#2B55E8] text-white shadow-[0_0_12px_rgba(43,85,232,0.3)]"
-                    : "bg-white/5 text-zinc-300 hover:bg-white/10 border border-white/5"
-                }`}
+                    ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                    : "bg-secondary/40 text-foreground hover:bg-secondary border border-border/50"
+                )}
               >
                 {opt.label}
               </button>
@@ -160,13 +168,13 @@ export function GpuFiltersPanel({
       </div>
 
       {/* 3. Price per Hour (NPR) Filter */}
-      <div className="space-y-3">
-        <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+      <div className="space-y-2.5">
+        <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
           Price / Hour (NPR)
         </label>
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <span className="block text-[11px] text-zinc-500 mb-1">Min (NPR)</span>
+            <span className="block text-[10px] uppercase font-semibold text-muted-foreground mb-1">Min</span>
             <input
               type="number"
               min={0}
@@ -176,11 +184,11 @@ export function GpuFiltersPanel({
                 const val = e.target.value === "" ? null : Math.max(0, Number(e.target.value));
                 onChange({ ...filters, minPrice: val });
               }}
-              className="h-9 w-full rounded-lg bg-[#0a0a0a] px-3 text-xs text-white placeholder:text-zinc-600 border border-white/10 outline-none focus:border-[#2B55E8]"
+              className="h-9 w-full rounded-lg bg-card px-3 text-xs text-foreground placeholder:text-muted-foreground border border-input outline-none focus:border-primary focus:ring-1 focus:ring-primary"
             />
           </div>
           <div>
-            <span className="block text-[11px] text-zinc-500 mb-1">Max (NPR)</span>
+            <span className="block text-[10px] uppercase font-semibold text-muted-foreground mb-1">Max</span>
             <input
               type="number"
               min={0}
@@ -190,7 +198,7 @@ export function GpuFiltersPanel({
                 const val = e.target.value === "" ? null : Math.max(0, Number(e.target.value));
                 onChange({ ...filters, maxPrice: val });
               }}
-              className="h-9 w-full rounded-lg bg-[#0a0a0a] px-3 text-xs text-white placeholder:text-zinc-600 border border-white/10 outline-none focus:border-[#2B55E8]"
+              className="h-9 w-full rounded-lg bg-card px-3 text-xs text-foreground placeholder:text-muted-foreground border border-input outline-none focus:border-primary focus:ring-1 focus:ring-primary"
             />
           </div>
         </div>
@@ -198,11 +206,11 @@ export function GpuFiltersPanel({
 
       {/* 4. Location Filter */}
       {availableLocations.length > 0 && (
-        <div className="space-y-3">
-          <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+        <div className="space-y-2.5">
+          <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             Location
           </label>
-          <div className="flex flex-col gap-1.5 max-h-40 overflow-y-auto pr-1">
+          <div className="flex flex-col gap-1 max-h-40 overflow-y-auto pr-1">
             {availableLocations.map(({ name, count }) => {
               const isSelected = filters.locations.includes(name);
               return (
@@ -210,25 +218,27 @@ export function GpuFiltersPanel({
                   key={name}
                   type="button"
                   onClick={() => toggleLocation(name)}
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all text-left ${
+                  className={cn(
+                    "flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all text-left cursor-pointer",
                     isSelected
-                      ? "bg-[#2B55E8]/20 text-white border border-[#2B55E8]/40"
-                      : "text-zinc-300 hover:bg-white/5 border border-transparent"
-                  }`}
+                      ? "bg-primary/10 text-primary border border-primary/30 font-semibold"
+                      : "text-foreground hover:bg-secondary/60 border border-transparent"
+                  )}
                 >
-                  <div className="flex items-center gap-2 truncate mr-2">
+                  <div className="flex items-center gap-2.5 truncate mr-2">
                     <div
-                      className={`w-3.5 h-3.5 rounded border flex items-center justify-center transition-colors ${
+                      className={cn(
+                        "w-4 h-4 rounded-md border flex items-center justify-center transition-colors shrink-0",
                         isSelected
-                          ? "bg-[#2B55E8] border-[#2B55E8] text-white"
-                          : "border-zinc-600 bg-transparent"
-                      }`}
+                          ? "bg-primary border-primary text-primary-foreground"
+                          : "border-input bg-card"
+                      )}
                     >
                       {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                     </div>
                     <span className="truncate">{name}</span>
                   </div>
-                  <span className="text-[11px] text-zinc-400 shrink-0 font-mono">
+                  <span className="text-[11px] text-muted-foreground shrink-0 font-mono font-medium">
                     {count}
                   </span>
                 </button>
@@ -239,9 +249,9 @@ export function GpuFiltersPanel({
       )}
 
       {/* 5. Availability Filter */}
-      <div className="pt-3 border-t border-white/10">
+      <div className="pt-3 border-t border-border/60">
         <label className="flex items-center justify-between cursor-pointer py-1">
-          <span className="text-xs font-medium text-zinc-300">
+          <span className="text-xs font-medium text-foreground">
             Available now only
           </span>
           <input
@@ -250,7 +260,7 @@ export function GpuFiltersPanel({
             onChange={(e) =>
               onChange({ ...filters, availableOnly: e.target.checked })
             }
-            className="w-4 h-4 rounded border-zinc-700 bg-black text-[#2B55E8] focus:ring-[#2B55E8] focus:ring-offset-0 cursor-pointer"
+            className="w-4 h-4 rounded border-input text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer accent-primary"
           />
         </label>
       </div>

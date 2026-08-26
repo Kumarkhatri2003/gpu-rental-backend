@@ -20,7 +20,7 @@ const sortOptions: { label: string; value: SortOption }[] = [
 export function GpuSort({ value, onChange }: GpuSortProps) {
   return (
     <div className="flex items-center gap-2">
-      <label htmlFor="gpu-sort-select" className="text-xs text-zinc-400 font-medium hidden sm:inline whitespace-nowrap">
+      <label htmlFor="gpu-sort-select" className="text-xs text-muted-foreground font-medium hidden sm:inline whitespace-nowrap">
         Sort by:
       </label>
       <div className="relative">
@@ -29,15 +29,15 @@ export function GpuSort({ value, onChange }: GpuSortProps) {
           aria-label="Sort GPU listings"
           value={value}
           onChange={(e) => onChange(e.target.value as SortOption)}
-          className="h-11 appearance-none rounded-lg bg-[#121212] pl-9 pr-8 text-sm font-medium text-white border border-white/10 outline-none transition-all hover:border-white/20 focus:border-[#2B55E8] focus:ring-1 focus:ring-[#2B55E8] cursor-pointer"
+          className="h-10 appearance-none rounded-xl bg-card pl-9 pr-8 text-sm font-medium text-foreground border border-input outline-none shadow-xs transition-all hover:border-border/80 focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
         >
           {sortOptions.map((opt) => (
-            <option key={opt.value} value={opt.value} className="bg-[#18181b] text-white">
+            <option key={opt.value} value={opt.value} className="bg-card text-foreground">
               {opt.label}
             </option>
           ))}
         </select>
-        <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400 pointer-events-none" />
+        <ArrowUpDown className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
       </div>
     </div>
   );

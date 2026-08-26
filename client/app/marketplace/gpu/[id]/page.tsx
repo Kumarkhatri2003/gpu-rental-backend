@@ -19,6 +19,8 @@ import {
   AlertTriangle,
   RotateCcw,
 } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 function useIsMounted() {
   return useSyncExternalStore(
@@ -103,11 +105,11 @@ export default function GpuDetailsPage() {
   const isAvailable = gpu?.availability === "available";
 
   const detailsBody = (
-    <div className="max-w-4xl mx-auto flex flex-col gap-8 w-full">
+    <div className="max-w-4xl mx-auto flex flex-col gap-6 w-full pb-12">
       {/* Back to Marketplace */}
       <Link
         href="/marketplace"
-        className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors w-fit"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground font-medium transition-colors w-fit"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Marketplace
@@ -115,193 +117,192 @@ export default function GpuDetailsPage() {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="rounded-xl border border-white/10 bg-[#121212] p-8 flex flex-col items-center justify-center min-h-[300px] gap-4">
-          <div className="w-8 h-8 rounded-full border-2 border-[#2B55E8] border-t-transparent animate-spin" />
-          <p className="text-sm text-zinc-400">Loading GPU instance details...</p>
-        </div>
+        <Card variant="default" className="p-12 flex flex-col items-center justify-center min-h-[320px] gap-4">
+          <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+          <p className="text-sm font-medium text-muted-foreground">Loading GPU instance details...</p>
+        </Card>
       )}
 
       {/* Error State */}
       {!isLoading && error && (
-        <div className="rounded-xl border border-red-500/20 bg-[#121212] p-8 flex flex-col items-center justify-center min-h-[300px] text-center">
-          <div className="p-3.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 mb-4">
+        <Card variant="default" className="border-destructive/20 p-8 flex flex-col items-center justify-center min-h-[320px] text-center">
+          <div className="p-4 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive mb-4">
             <AlertTriangle className="w-8 h-8" />
           </div>
-          <h3 className="text-lg font-bold text-white mb-2">Instance Unavailable</h3>
-          <p className="text-sm text-zinc-400 max-w-md mb-6">{error}</p>
-          <button
-            type="button"
-            onClick={fetchDetails}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#2B55E8] text-sm font-semibold text-white hover:bg-[#315FFF] transition-all cursor-pointer"
+          <h3 className="text-lg font-bold text-foreground mb-2">Instance Unavailable</h3>
+          <p className="text-sm text-muted-foreground max-w-md mb-6">{error}</p>
+          <Button
+            variant="secondary"
+            onPress={fetchDetails}
+            className="gap-2 font-semibold shadow-xs"
           >
             <RotateCcw className="w-4 h-4" />
             Retry
-          </button>
-        </div>
+          </Button>
+        </Card>
       )}
 
       {/* Details Card */}
       {!isLoading && !error && gpu && (
         <div className="flex flex-col gap-6">
           {/* Header & Main Info Card */}
-          <div className="rounded-xl border border-white/10 bg-[#121212] p-6 sm:p-8">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
-              <div className="flex items-center gap-3.5">
-                <div className="p-3 rounded-xl bg-[#2B55E8]/10 text-[#2B55E8] border border-[#2B55E8]/20 shrink-0">
+          <Card variant="default" className="p-6 sm:p-8">
+            <Card.Header className="p-0 pb-6 flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 space-y-0">
+              <div className="flex items-center gap-4">
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-indigo-500/15 to-violet-500/15 text-primary border border-primary/20 shrink-0 shadow-xs">
                   <Cpu className="w-7 h-7" />
                 </div>
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                  <Card.Title className="text-2xl sm:text-3xl font-extrabold tracking-tight">
                     {gpu.name}
-                  </h1>
-                  <div className="flex items-center gap-2 text-xs text-zinc-400 mt-1">
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5" />
+                  </Card.Title>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                    <span className="flex items-center gap-1 font-medium">
+                      <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
                       {gpu.location}
                     </span>
-                    <span>•</span>
-                    <span>Provider Online</span>
+                    <span>&bull;</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">Provider Online</span>
                   </div>
                 </div>
               </div>
 
               <span
-                className={`inline-flex items-center self-start sm:self-center text-xs font-semibold px-3 py-1.5 rounded-full border ${
+                className={`inline-flex items-center self-start sm:self-center text-xs font-semibold px-3 py-1 rounded-full border ${
                   isAvailable
-                    ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
-                    : "text-amber-400 bg-amber-500/10 border-amber-500/20"
+                    ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+                    : "text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20"
                 }`}
               >
                 <span
                   className={`w-2 h-2 rounded-full mr-2 ${
                     isAvailable
-                      ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"
-                      : "bg-amber-400"
+                      ? "bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"
+                      : "bg-amber-500"
                   }`}
                 />
                 {isAvailable ? "Available for Rental" : gpu.availability}
               </span>
-            </div>
+            </Card.Header>
 
-            {/* Grid of Verified Properties */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
-              <div className="p-4 rounded-lg bg-black/40 border border-white/5">
-                <span className="text-xs text-zinc-400 font-medium block mb-1">
-                  VRAM Capacity
-                </span>
-                <span className="text-lg font-bold text-white">
-                  {gpu.vram} GB
-                </span>
+            <Card.Content className="p-0">
+              {/* Grid of Verified Properties */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
+                <div className="p-4 rounded-xl bg-secondary/50 border border-border/60">
+                  <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider block mb-1">
+                    VRAM Capacity
+                  </span>
+                  <span className="text-xl font-bold text-foreground">
+                    {gpu.vram} GB
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-xl bg-secondary/50 border border-border/60">
+                  <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider block mb-1">
+                    Compute Location
+                  </span>
+                  <span className="text-xl font-bold text-foreground">
+                    {gpu.location}
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-xl bg-secondary/50 border border-border/60">
+                  <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider block mb-1">
+                    Hourly Rate
+                  </span>
+                  <span className="text-xl font-bold text-foreground font-mono">
+                    NPR {gpu.pricePerHour.toLocaleString()}
+                    <span className="text-xs font-normal text-muted-foreground ml-1">/ hr</span>
+                  </span>
+                </div>
               </div>
 
-              <div className="p-4 rounded-lg bg-black/40 border border-white/5">
-                <span className="text-xs text-zinc-400 font-medium block mb-1">
-                  Compute Location
-                </span>
-                <span className="text-lg font-bold text-white">
-                  {gpu.location}
-                </span>
+              {/* Security and Provisioning notes */}
+              <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 flex items-start gap-3 mb-6">
+                <ShieldCheck className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <div className="text-xs text-foreground/80 leading-relaxed">
+                  <strong className="text-foreground">Direct SSH Provisioning:</strong> Session credentials and relay-port routing are allocated automatically upon rental confirmation. Wallet balance is deducted hourly based on active duration.
+                </div>
               </div>
+            </Card.Content>
 
-              <div className="p-4 rounded-lg bg-black/40 border border-white/5">
-                <span className="text-xs text-zinc-400 font-medium block mb-1">
-                  Hourly Rate
-                </span>
-                <span className="text-lg font-bold text-white">
-                  NPR {gpu.pricePerHour.toLocaleString()}
-                  <span className="text-xs font-normal text-zinc-400 ml-1">/ hr</span>
-                </span>
-              </div>
-            </div>
-
-            {/* Security and Provisioning notes */}
-            <div className="p-4 rounded-lg bg-[#2B55E8]/5 border border-[#2B55E8]/15 flex items-start gap-3 mb-6">
-              <ShieldCheck className="w-5 h-5 text-[#2B55E8] shrink-0 mt-0.5" />
-              <div className="text-xs text-zinc-300 leading-relaxed">
-                <strong className="text-white">Direct SSH Provisioning:</strong> Session credentials and relay-port routing are allocated automatically upon rental confirmation. Wallet balance is deducted hourly based on active duration.
-              </div>
-            </div>
-
-            {/* Action CTA */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-white/10">
+            {/* Action CTA Footer */}
+            <Card.Footer className="p-0 pt-6 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-baseline gap-2">
-                <span className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+                <span className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight font-mono">
                   NPR {gpu.pricePerHour.toLocaleString()}
                 </span>
-                <span className="text-sm text-zinc-400">/ hour</span>
+                <span className="text-sm text-muted-foreground font-medium">/ hour</span>
               </div>
 
-              <button
-                type="button"
-                disabled={!isAvailable}
-                onClick={handleRentClick}
-                className={`w-full sm:w-auto px-8 h-12 inline-flex items-center justify-center gap-2 rounded-lg text-sm font-semibold transition-all ${
-                  isAvailable
-                    ? "bg-[#2B55E8] hover:bg-[#315FFF] text-white shadow-[0_8px_20px_rgba(43,85,232,0.3)] cursor-pointer"
-                    : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-                }`}
+              <Button
+                variant="primary"
+                size="lg"
+                isDisabled={!isAvailable}
+                onPress={handleRentClick}
+                className="w-full sm:w-auto px-8 gap-2 font-semibold shadow-sm"
               >
                 <Zap className="w-4 h-4" />
-                {isAvailable ? "Rent GPU" : "Currently In Use"}
-              </button>
-            </div>
-          </div>
+                <span>{isAvailable ? "Rent GPU" : "Currently In Use"}</span>
+              </Button>
+            </Card.Footer>
+          </Card>
         </div>
       )}
 
       {/* Rental Confirmation Modal for Authenticated Users */}
       {isRentModalOpen && gpu && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-md rounded-2xl border border-white/15 bg-[#121212] p-6 shadow-2xl">
-            <div className="flex items-center gap-3 pb-4 border-b border-white/10">
-              <div className="p-2.5 rounded-lg bg-[#2B55E8]/10 text-[#2B55E8]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <Card variant="default" className="w-full max-w-md p-6 shadow-2xl space-y-5">
+            <Card.Header className="p-0 pb-3 flex-row items-center gap-3 border-b border-border space-y-0">
+              <div className="p-2.5 rounded-xl bg-primary/10 text-primary border border-primary/20">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-bold text-lg text-white">Confirm Rental Session</h3>
-                <p className="text-xs text-zinc-400">Initiate instance provisioning</p>
+                <Card.Title className="text-lg font-bold">Confirm Rental Session</Card.Title>
+                <Card.Description className="text-xs">Initiate instance provisioning</Card.Description>
               </div>
-            </div>
+            </Card.Header>
 
-            <div className="space-y-3 my-5 text-sm">
-              <div className="flex justify-between text-zinc-300">
+            <Card.Content className="p-0 space-y-3 my-4 text-sm">
+              <div className="flex justify-between text-muted-foreground">
                 <span>GPU Model:</span>
-                <span className="font-semibold text-white">{gpu.name}</span>
+                <span className="font-semibold text-foreground">{gpu.name}</span>
               </div>
-              <div className="flex justify-between text-zinc-300">
+              <div className="flex justify-between text-muted-foreground">
                 <span>VRAM:</span>
-                <span className="font-semibold text-white">{gpu.vram} GB</span>
+                <span className="font-semibold text-foreground">{gpu.vram} GB</span>
               </div>
-              <div className="flex justify-between text-zinc-300">
+              <div className="flex justify-between text-muted-foreground">
                 <span>Location:</span>
-                <span className="font-semibold text-white">{gpu.location}</span>
+                <span className="font-semibold text-foreground">{gpu.location}</span>
               </div>
-              <div className="flex justify-between text-zinc-300 pt-2 border-t border-white/5">
+              <div className="flex justify-between text-muted-foreground pt-2 border-t border-border/60">
                 <span>Rental Rate:</span>
-                <span className="font-bold text-white">NPR {gpu.pricePerHour} / hr</span>
+                <span className="font-bold text-foreground font-mono">NPR {gpu.pricePerHour} / hr</span>
               </div>
-            </div>
+            </Card.Content>
 
-            <div className="flex gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setIsRentModalOpen(false)}
-                className="flex-1 h-10 rounded-lg border border-white/15 text-sm font-semibold text-zinc-300 hover:bg-white/5 transition-all cursor-pointer"
+            <Card.Footer className="p-0 pt-2 flex gap-3">
+              <Button
+                variant="tertiary"
+                onPress={() => setIsRentModalOpen(false)}
+                className="flex-1 font-semibold"
               >
                 Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => {
+              </Button>
+              <Button
+                variant="primary"
+                onPress={() => {
                   setIsRentModalOpen(false);
                   router.push("/dashboard");
                 }}
-                className="flex-1 h-10 rounded-lg bg-[#2B55E8] text-sm font-semibold text-white hover:bg-[#315FFF] transition-all shadow-[0_4px_16px_rgba(43,85,232,0.3)] cursor-pointer"
+                className="flex-1 font-semibold"
               >
                 Go to Dashboard
-              </button>
-            </div>
-          </div>
+              </Button>
+            </Card.Footer>
+          </Card>
         </div>
       )}
     </div>
@@ -314,7 +315,7 @@ export default function GpuDetailsPage() {
 
   // Public / Guest Mode: Render with Website Navbar and Footer
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-[#000000] text-white selection:bg-[#2B55E8]/30">
+    <div className="min-h-screen flex flex-col font-sans bg-background text-foreground">
       <Navbar />
       <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-10 py-10">
         {detailsBody}

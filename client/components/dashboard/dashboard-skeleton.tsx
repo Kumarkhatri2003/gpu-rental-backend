@@ -3,74 +3,77 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export function DashboardSkeleton() {
   return (
-    <div className="flex flex-col gap-8 animate-in fade-in duration-500">
+    <div className="flex flex-col gap-6 max-w-6xl mx-auto w-full pb-10 animate-pulse">
       <div className="mb-2">
-        <Skeleton className="h-9 w-48 mb-4" />
-        <Skeleton className="h-5 w-64" />
+        <Skeleton className="h-8 w-48 mb-2 rounded-lg bg-muted/60" />
+        <Skeleton className="h-4 w-64 rounded-md bg-muted/40" />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="bg-[#121212] border-white/10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Card className="bg-card border-border shadow-corporate">
           <CardContent className="p-6">
-            <Skeleton className="h-4 w-24 mb-6" />
-            <Skeleton className="h-8 w-32 mb-2" />
-            <Skeleton className="h-4 w-24 mb-8" />
-            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-3.5 w-24 mb-4 rounded bg-muted/60" />
+            <Skeleton className="h-8 w-36 mb-2 rounded-lg bg-muted/70" />
+            <Skeleton className="h-3.5 w-28 rounded bg-muted/40" />
           </CardContent>
         </Card>
-        <Card className="bg-[#121212] border-white/10">
+        <Card className="bg-card border-border shadow-corporate">
           <CardContent className="p-6">
-            <Skeleton className="h-4 w-24 mb-6" />
-            <Skeleton className="h-8 w-16 mb-2" />
-            <Skeleton className="h-4 w-24 mb-8" />
-            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-3.5 w-24 mb-4 rounded bg-muted/60" />
+            <Skeleton className="h-8 w-16 mb-2 rounded-lg bg-muted/70" />
+            <Skeleton className="h-3.5 w-32 rounded bg-muted/40" />
+          </CardContent>
+        </Card>
+        <Card className="bg-card border-border shadow-corporate">
+          <CardContent className="p-6">
+            <Skeleton className="h-3.5 w-24 mb-4 rounded bg-muted/60" />
+            <Skeleton className="h-8 w-16 mb-2 rounded-lg bg-muted/70" />
+            <Skeleton className="h-3.5 w-20 rounded bg-muted/40" />
           </CardContent>
         </Card>
       </div>
 
-      <Card className="bg-[#121212] border-white/10 min-h-[200px]">
-        <CardContent className="p-6 md:p-8 flex flex-col justify-center h-full">
-          <Skeleton className="h-4 w-32 mb-8" />
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="space-y-4 flex-1">
-              <div className="flex items-center gap-3">
-                <Skeleton className="h-8 w-48" />
-                <Skeleton className="h-6 w-20 rounded-full" />
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        <div className="lg:col-span-3">
+          <Card className="bg-card border-border shadow-corporate min-h-[300px]">
+            <CardContent className="p-6 flex flex-col justify-between h-full">
+              <div className="flex justify-between items-center mb-6">
+                <Skeleton className="h-4 w-32 rounded bg-muted/60" />
+                <Skeleton className="h-6 w-20 rounded-full bg-muted/50" />
               </div>
-              <div className="flex gap-12 mt-2">
-                <Skeleton className="h-10 w-24" />
-                <Skeleton className="h-10 w-24" />
-                <Skeleton className="h-10 w-24" />
+              <div className="grid grid-cols-3 gap-3 my-4">
+                <Skeleton className="h-16 w-full rounded-xl bg-muted/40" />
+                <Skeleton className="h-16 w-full rounded-xl bg-muted/40" />
+                <Skeleton className="h-16 w-full rounded-xl bg-muted/40" />
               </div>
-            </div>
-            <Skeleton className="h-10 w-32 rounded-md" />
-          </div>
-        </CardContent>
-      </Card>
+              <Skeleton className="h-10 w-full rounded-lg bg-muted/60 mt-4" />
+            </CardContent>
+          </Card>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <div className="flex justify-between items-center mb-4">
-            <Skeleton className="h-6 w-32" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-          <div className="space-y-2">
-            {[1, 2, 3].map(i => (
-              <Skeleton key={i} className="h-16 w-full rounded-lg" />
-            ))}
-          </div>
+          <Card className="bg-card border-border shadow-corporate min-h-[300px]">
+            <CardContent className="p-6 flex flex-col gap-3">
+              <Skeleton className="h-4 w-32 mb-2 rounded bg-muted/60" />
+              <Skeleton className="h-14 w-full rounded-xl bg-muted/40" />
+              <Skeleton className="h-14 w-full rounded-xl bg-muted/40" />
+              <Skeleton className="h-14 w-full rounded-xl bg-muted/40" />
+            </CardContent>
+          </Card>
         </div>
-        <div className="lg:col-span-1">
-          <div className="flex justify-between items-center mb-4">
-            <Skeleton className="h-6 w-32" />
-            <Skeleton className="h-4 w-24" />
-          </div>
-          <div className="space-y-4">
-            {[1, 2].map(i => (
-              <Skeleton key={i} className="h-32 w-full rounded-xl" />
-            ))}
-          </div>
-        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4">
+        <Card className="bg-card border-border shadow-corporate">
+          <CardContent className="p-6">
+            <Skeleton className="h-4 w-32 mb-4 rounded bg-muted/60" />
+            <div className="space-y-3">
+              <Skeleton className="h-10 w-full rounded-lg bg-muted/30" />
+              <Skeleton className="h-10 w-full rounded-lg bg-muted/30" />
+              <Skeleton className="h-10 w-full rounded-lg bg-muted/30" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

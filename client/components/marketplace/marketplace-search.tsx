@@ -20,20 +20,20 @@ export function MarketplaceSearch({
         Search GPUs
       </label>
       <div className="relative flex items-center">
-        <Search className="absolute left-3.5 h-4 w-4 text-zinc-400 pointer-events-none" />
+        <Search className="absolute left-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
         <input
           id="marketplace-gpu-search"
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="h-11 w-full rounded-lg bg-[#121212] pl-10 pr-10 text-sm text-white placeholder:text-zinc-500 border border-white/10 outline-none transition-all focus:border-[#2B55E8] focus:ring-1 focus:ring-[#2B55E8]"
+          className="h-10 w-full rounded-xl bg-card pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground border border-input shadow-xs outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
         />
         {value && (
           <button
             type="button"
             onClick={() => onChange("")}
-            className="absolute right-3 p-1 text-zinc-400 hover:text-white rounded transition-colors"
+            className="absolute right-3 p-1 text-muted-foreground hover:text-foreground rounded transition-colors cursor-pointer"
             aria-label="Clear search"
           >
             <X className="h-4 w-4" />

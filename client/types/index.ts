@@ -23,14 +23,10 @@ export interface GPU {
   createdAt?: string;
 }
 
-export interface Session {
-  id: string;
-  renterId: string;
-  gpuId: string;
-  startTime: string;
-  endTime: string | null;
-  status: "active" | "completed" | "cancelled" | "pending" | "failed";
-  totalCost: number | null;
-}
-
 export * from "./gpu";
+export * from "./session";
+export * from "./wallet";
+export * from "./user";
+
+
+

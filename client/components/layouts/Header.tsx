@@ -12,41 +12,56 @@ export function Header() {
   const { setTheme, theme } = useTheme();
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b bg-background/95 px-4 sm:px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-border/80 bg-background/80 px-4 sm:px-6 backdrop-blur-md transition-colors">
       <div className="flex items-center gap-3">
         <Button
           variant="ghost"
-          size="icon"
-          onClick={toggleSidebar}
-          className="text-muted-foreground hover:text-foreground cursor-pointer"
-          title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          size="sm"
+          isIconOnly
+          onPress={toggleSidebar}
+          aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          className="text-muted-foreground hover:text-foreground"
         >
           {isSidebarOpen ? (
-            <PanelLeftClose className="h-5 w-5" />
+            <PanelLeftClose className="h-4 w-4" />
           ) : (
-            <PanelLeftOpen className="h-5 w-5" />
+            <PanelLeftOpen className="h-4 w-4" />
           )}
-          <span className="sr-only">Toggle Sidebar</span>
         </Button>
-        <div className="hidden sm:flex items-center text-sm font-medium">
-          Welcome, {user?.name || "User"}
+
+        <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
+          <span>Welcome back,</span>
+          <span className="font-semibold text-foreground flex items-center gap-1.5">
+            <span className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500/20 to-violet-500/20 border border-indigo-500/30 flex items-center justify-center text-primary text-xs font-bold">
+              {(user?.name || "U")[0].toUpperCase()}
+            </span>
+            {user?.name || "User"}
+          </span>
         </div>
       </div>
       
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <Button
           variant="ghost"
-          size="icon"
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          className="cursor-pointer"
+          size="sm"
+          isIconOnly
+          onPress={() => setTheme(theme === "dark" ? "light" : "dark")}
+          aria-label="Toggle theme"
+          className="text-muted-foreground hover:text-foreground"
         >
-          <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
+          <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={logout} className="cursor-pointer">
-          <LogOut className="h-5 w-5 text-destructive" />
-          <span className="sr-only">Logout</span>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          isIconOnly
+          onPress={logout}
+          aria-label="Sign out"
+          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+        >
+          <LogOut className="h-4 w-4" />
         </Button>
       </div>
     </header>

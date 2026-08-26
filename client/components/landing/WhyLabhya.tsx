@@ -1,58 +1,63 @@
 import { Banknote, Clock, Box, Lock } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 export function WhyLabhya() {
   const features = [
     {
-      title: "Affordable GPU Compute",
-      description: "Access powerful GPUs without purchasing expensive hardware. Pay only for what you use.",
-      icon: <Banknote className="w-6 h-6 text-[#2B55E8]" />
+      title: "Cost-Effective Compute",
+      description: "Access high-end consumer and data-center GPUs without heavy capital expenditure. Pay strictly for elapsed compute time.",
+      icon: <Banknote className="w-5 h-5 text-primary" />
     },
     {
-      title: "On-Demand Access",
-      description: "Rent compute when you need it instead of maintaining dedicated infrastructure.",
-      icon: <Clock className="w-6 h-6 text-[#2B55E8]" />
+      title: "Instant On-Demand Access",
+      description: "Rent compute when you need it instead of maintaining idle local clusters or expensive long-term cloud commitments.",
+      icon: <Clock className="w-5 h-5 text-primary" />
     },
     {
-      title: "Isolated Environments",
-      description: "Renter workloads run inside isolated Docker/Ubuntu environments for stability.",
-      icon: <Box className="w-6 h-6 text-[#2B55E8]" />
+      title: "Isolated Container Runtimes",
+      description: "Every workload runs inside an isolated Docker/Ubuntu container with zero host file-system cross-contamination.",
+      icon: <Box className="w-5 h-5 text-primary" />
     },
     {
-      title: "Secure SSH Access",
-      description: "The rental environment is exposed through the platform's secure SSH relay architecture.",
-      icon: <Lock className="w-6 h-6 text-[#2B55E8]" />
+      title: "Encrypted SSH Relays",
+      description: "Secure peer-to-peer relay architecture routes encrypted SSH traffic without requiring public IP addresses on hosts.",
+      icon: <Lock className="w-5 h-5 text-primary" />
     }
   ];
 
   return (
-    <section className="py-24 bg-[#000000]">
+    <section className="py-24 bg-secondary/30 border-b border-border/60">
       <div className="container mx-auto px-6 lg:px-10">
-        <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-8">
-          <div className="max-w-2xl">
-            <h2 className="text-[32px] font-bold tracking-tight text-white mb-4">
-              Why Labhya Compute
-            </h2>
-            <p className="text-[16px] text-[#d4d4d4]">
-              Built for performance and reliability. Get enterprise-grade features at peer-to-peer pricing.
-            </p>
+        <div className="text-center mb-16 max-w-2xl mx-auto">
+          <div className="text-xs font-bold uppercase tracking-wider text-primary mb-2">
+            Why Labhya Compute
           </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-3">
+            Engineered for Modern AI Engineering
+          </h2>
+          <p className="text-base text-muted-foreground leading-relaxed">
+            Enterprise-grade container isolation and direct GPU passthrough at peer-to-peer market pricing.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {features.map((feature, idx) => (
-            <div key={idx} className="flex gap-6 p-6 md:p-8 rounded-2xl bg-[#121212] border border-white/5 hover:border-white/20 hover:bg-[#1a1a1a] transition-all">
-              <div className="flex-shrink-0">
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#2B55E8]/10">
-                  {feature.icon}
-                </div>
+            <Card
+              key={idx}
+              className="flex items-start gap-5 p-6 sm:p-8 rounded-2xl border border-border bg-card shadow-corporate transition-all duration-200 hover:-translate-y-1 hover:shadow-corporate-hover"
+            >
+              <div className="p-3.5 bg-gradient-to-br from-indigo-500/15 to-violet-500/15 text-primary border border-primary/20 rounded-2xl shrink-0">
+                {feature.icon}
               </div>
-              <div>
-                <h3 className="text-[18px] font-bold text-white mb-2 tracking-tight">{feature.title}</h3>
-                <p className="text-[14px] text-[#d4d4d4] leading-relaxed">
+              <div className="space-y-1.5">
+                <h3 className="text-base font-bold text-foreground tracking-tight">
+                  {feature.title}
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                   {feature.description}
                 </p>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       </div>

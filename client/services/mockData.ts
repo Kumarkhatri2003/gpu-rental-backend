@@ -12,31 +12,77 @@ export const mockWalletData: WalletData = {
 
 export const mockSessions: Session[] = [
   {
-    id: "sess-1",
+    id: "sess-8492f1a",
     renterId: "user-1",
-    gpuId: "gpu-1", // Maps to RTX 4090
-    startTime: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    hostId: "host-101",
+    gpuId: "gpu-1",
+    gpuName: "NVIDIA RTX 4090",
+    gpuModel: "NVIDIA RTX 4090",
+    vram: 24,
+    pricePerHour: 180,
+    startTime: new Date(Date.now() - 2 * 60 * 60 * 1000 - 15 * 60 * 1000).toISOString(),
     endTime: null,
     status: "active",
-    totalCost: 268.80
+    connectionStatus: "ready",
+    sshHost: "relay.labhya.io",
+    sshPort: 22045,
+    sshUser: "renter",
+    gpuUtilization: 74,
+    totalCost: 405.00
   },
   {
-    id: "sess-2",
+    id: "sess-7182e3b",
     renterId: "user-1",
-    gpuId: "gpu-2", // Maps to RTX 3090
-    startTime: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-    endTime: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
+    hostId: "host-102",
+    gpuId: "gpu-2",
+    gpuName: "NVIDIA RTX 3090",
+    gpuModel: "NVIDIA RTX 3090",
+    vram: 24,
+    pricePerHour: 120,
+    startTime: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+    endTime: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
     status: "completed",
-    totalCost: 240
+    connectionStatus: "disconnected",
+    sshHost: "relay.labhya.io",
+    sshPort: 22018,
+    sshUser: "renter",
+    totalCost: 240.00
   },
   {
-    id: "sess-3",
+    id: "sess-5910c9d",
     renterId: "user-1",
+    hostId: "host-104",
     gpuId: "gpu-4",
-    startTime: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-    endTime: new Date(Date.now() - 22 * 60 * 60 * 1000).toISOString(),
+    gpuName: "NVIDIA RTX A6000",
+    gpuModel: "NVIDIA RTX A6000",
+    vram: 48,
+    pricePerHour: 260,
+    startTime: new Date(Date.now() - 28 * 60 * 60 * 1000).toISOString(),
+    endTime: new Date(Date.now() - 25 * 60 * 60 * 1000).toISOString(),
     status: "completed",
-    totalCost: 120
+    connectionStatus: "disconnected",
+    sshHost: "relay.labhya.io",
+    sshPort: 22031,
+    sshUser: "renter",
+    totalCost: 780.00
+  },
+  {
+    id: "sess-3209a8f",
+    renterId: "user-1",
+    hostId: "host-103",
+    gpuId: "gpu-3",
+    gpuName: "NVIDIA RTX 4080",
+    gpuModel: "NVIDIA RTX 4080",
+    vram: 16,
+    pricePerHour: 140,
+    startTime: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(),
+    endTime: new Date(Date.now() - 71 * 60 * 60 * 1000).toISOString(),
+    status: "completed",
+    connectionStatus: "disconnected",
+    sshHost: "relay.labhya.io",
+    sshPort: 22012,
+    sshUser: "renter",
+    totalCost: 140.00
   }
 ];
 
