@@ -29,10 +29,11 @@ logs/
 # Miscellaneous
 scratch/
 
-# Python/Django ignores
+# Python Build and Cache
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-db.sqlite3
-
+.pytest_cache/
+.venv/
+venv/

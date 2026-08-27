@@ -46,7 +46,6 @@ class GPUFilter(filters.BaseFilterBackend):
                 Q(location__icontains=search)
             )
         
-        
         min_uptime = params.get('min_uptime')  # ← Get from params with correct key
         if min_uptime:
             queryset = queryset.filter(host__uptime_percentage__gte=min_uptime)
