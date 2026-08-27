@@ -64,7 +64,7 @@ export function Sidebar() {
                 <Cpu className="h-4 w-4" />
               </div>
               <span className="truncate bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 dark:from-white dark:via-indigo-200 dark:to-white bg-clip-text text-transparent">
-                Labhya Compute
+                tero gpu de malai
               </span>
             </Link>
             <Button

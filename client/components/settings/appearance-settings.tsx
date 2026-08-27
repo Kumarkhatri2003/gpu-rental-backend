@@ -96,7 +96,7 @@ export function AppearanceSettings() {
           <div>
             <Card.Title className="text-base font-bold">Appearance</Card.Title>
             <Card.Description className="text-xs mt-0.5">
-              Customise how Labhya Compute looks and feels.
+              Customise how tero gpu de malai looks and feels.
             </Card.Description>
           </div>
         </div>

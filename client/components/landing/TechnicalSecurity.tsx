@@ -17,7 +17,7 @@ export function TechnicalSecurity() {
             </h2>
             
             <p className="text-base text-muted-foreground mb-8 leading-relaxed">
-              We&apos;ve built Labhya Compute with security from the ground up. You receive a fully isolated Ubuntu environment, ensuring both your proprietary code and the host&apos;s system remain protected and separate.
+              We&apos;ve built tero gpu de malai with security from the ground up. You receive a fully isolated Ubuntu environment, ensuring both your proprietary code and the host&apos;s system remain protected and separate.
             </p>
             
             <ul className="space-y-4 text-sm">
@@ -50,7 +50,7 @@ export function TechnicalSecurity() {
                 </div>
                 
                 <div className="flex items-center justify-center p-3.5 bg-primary/10 text-primary rounded-xl border border-primary/25 font-bold">
-                  <span>Labhya Relay Gateway</span>
+                  <span>tero gpu de malai Relay Gateway</span>
                 </div>
                 
                 <div className="flex justify-center py-0.5 text-muted-foreground">

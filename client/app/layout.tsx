@@ -11,7 +11,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Labhya Compute - Enterprise GPU Infrastructure",
+  title: "tero gpu de malai - Enterprise GPU Infrastructure",
   description: "On-demand GPU compute resources for AI builders, researchers, and developers.",
 };
 
