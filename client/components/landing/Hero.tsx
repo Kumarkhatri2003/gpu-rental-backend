@@ -23,7 +23,7 @@ export function Hero() {
           </h1>
           
           <p className="text-base sm:text-lg text-muted-foreground mb-8 leading-relaxed font-normal max-w-xl">
-            Labhya Compute lets developers, researchers, and AI builders rent available compute capacity with zero hardware overhead and instant SSH access.
+            tero gpu de malai lets developers, researchers, and AI builders rent available compute capacity with zero hardware overhead and instant SSH access.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-4">

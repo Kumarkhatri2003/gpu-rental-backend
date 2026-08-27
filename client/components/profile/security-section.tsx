@@ -20,7 +20,7 @@ export function SecuritySection() {
               Account Password
             </h4>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Your password and authentication tokens are managed securely through Labhya Compute IAM. Password reset requests can be initiated from the login screen.
+              Your password and authentication tokens are managed securely through tero gpu de malai IAM. Password reset requests can be initiated from the login screen.
             </p>
           </div>
         </div>

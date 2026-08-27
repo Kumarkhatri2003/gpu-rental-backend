@@ -116,7 +116,7 @@ export function DepositDialog({
               Add Funds
             </h3>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Deposit compute credits to your Labhya wallet.
+              Deposit compute credits to your tero gpu de malai wallet.
             </p>
           </div>
         </div>

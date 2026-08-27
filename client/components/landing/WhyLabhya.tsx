@@ -30,7 +30,7 @@ export function WhyLabhya() {
       <div className="container mx-auto px-6 lg:px-10">
         <div className="text-center mb-16 max-w-2xl mx-auto">
           <div className="text-xs font-bold uppercase tracking-wider text-primary mb-2">
-            Why Labhya Compute
+            Why tero gpu de malai
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-3">
             Engineered for Modern AI Engineering

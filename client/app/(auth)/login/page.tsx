@@ -100,13 +100,13 @@ function LoginForm() {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-xs">
               <Cpu className="h-5 w-5" />
             </div>
-            <span>Labhya Compute</span>
+            <span>tero gpu de malai</span>
           </Link>
           <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
             Welcome back
           </h1>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Sign in to Labhya Compute
+            Sign in to tero gpu de malai
           </p>
         </div>
 

@@ -116,8 +116,8 @@ export function SecuritySettings() {
             <div className="rounded-2xl border border-border/60 bg-secondary/30 p-4 sm:p-5 space-y-1">
               <p className="text-sm font-bold text-foreground">Account Password</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Passwords and authentication tokens are managed securely through Labhya
-                Compute IAM. To reset your password, sign out and use the{" "}
+                Passwords and authentication tokens are managed securely through tero
+                gpu de malai IAM. To reset your password, sign out and use the{" "}
                 <span className="font-semibold text-primary">Forgot Password</span> link on
                 the login screen.
               </p>
@@ -182,7 +182,7 @@ export function SecuritySettings() {
               <div className="space-y-0.5">
                 <p className="text-sm font-bold text-destructive">Delete Account</p>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Permanently delete your Labhya Compute account and all associated data.
+                  Permanently delete your tero gpu de malai account and all associated data.
                   This action is irreversible.
                 </p>
               </div>

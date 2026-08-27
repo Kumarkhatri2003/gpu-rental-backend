@@ -37,7 +37,7 @@ export function HowItWorks() {
             Seamless Workflow
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-3">
-            How Labhya Compute Works
+            How tero gpu de malai Works
           </h2>
           <p className="text-base text-muted-foreground leading-relaxed">
             Get from zero to running AI workloads in minutes through automated container provisioning.

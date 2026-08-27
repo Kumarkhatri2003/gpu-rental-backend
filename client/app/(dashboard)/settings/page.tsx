@@ -42,7 +42,7 @@ export default function SettingsPage() {
             <span>Settings</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-            Customise your Labhya Compute renter experience.
+            Customise your tero gpu de malai renter experience.
           </p>
         </div>
       </div>
