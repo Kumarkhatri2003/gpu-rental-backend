@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'gpus',
+    'wallets',
     
     # Third-party Apps
     'rest_framework',
