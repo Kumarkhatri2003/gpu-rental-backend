@@ -60,7 +60,7 @@ class DepositView(APIView):
                 pass
             
             # On successful payment
-            wallet = request.user.wallet
+            wallet, _ = Wallet.objects.get_or_create(user=request.user)
             wallet.add_funds(amount)
             
             transaction_obj.complete()
@@ -96,7 +96,7 @@ class WithdrawView(APIView):
         bank_name = serializer.validated_data['bank_name']
         account_holder_name = serializer.validated_data['account_holder_name']
         
-        wallet = request.user.wallet
+        wallet, _ = Wallet.objects.get_or_create(user=request.user)
         
         if wallet.available_balance < amount:
             return Response({

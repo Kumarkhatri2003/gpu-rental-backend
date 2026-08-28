@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'users',
     'gpus',
     'wallets',
+    'sessions',
     
     # Third-party Apps
     'rest_framework',
@@ -182,3 +183,7 @@ SIMPLE_JWT = {
 
 # CORS Configuration
 CORS_ALLOW_ALL_ORIGINS = True
+
+#relay port range
+RELAY_PORT_START = 40000
+RELAY_PORT_END = 50000

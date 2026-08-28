@@ -83,8 +83,12 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.full_name
     
     def get_wallet_balance(self, obj):
-        # Will be implemented in wallet app
-        return 0.00
+        try:
+            from wallets.models import Wallet
+            wallet, _ = Wallet.objects.get_or_create(user=obj)
+            return float(wallet.balance)
+        except Exception:
+            return 0.00
     
     def get_is_host(self, obj):
         return obj.is_host

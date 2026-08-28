@@ -7,9 +7,12 @@ from .models import Wallet
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_user_wallet(sender, instance, created, **kwargs):
-    """Create a wallet for every new user"""
+    """Create a wallet for every user if they don't have one"""
     if created:
-        Wallet.objects.create(user=instance)
+        Wallet.objects.get_or_create(user=instance)
+    else:
+        if not hasattr(instance, 'wallet'):
+            Wallet.objects.get_or_create(user=instance)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
