@@ -93,8 +93,9 @@ class GPU(models.Model):
     
     def update_stats(self, hours, earnings):
         """Update GPU statistics after a session"""
-        self.total_rental_hours += hours
-        self.total_earnings += earnings
+        from decimal import Decimal
+        self.total_rental_hours += Decimal(str(hours))
+        self.total_earnings += Decimal(str(earnings))
         self.total_sessions += 1
         self.save()
 

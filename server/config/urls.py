@@ -7,6 +7,7 @@ urlpatterns = [
     path('api/auth/', include('users.urls')),  # All auth endpoints
     path('api/gpus/', include('gpus.urls')), 
     path('api/wallets/', include('wallets.urls')),
+    path('api/sessions/', include('sessions.urls')),
     
     # OpenAPI Schema & API Documentation UI
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

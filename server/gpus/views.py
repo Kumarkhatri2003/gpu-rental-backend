@@ -119,6 +119,25 @@ class GPUCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         host = self.request.user.host_profile
         serializer.save(host=host)
+        
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        # Save the GPU
+        self.perform_create(serializer)
+        
+        # Get the created instance
+        instance = serializer.instance
+        
+        # Serialize with full details
+        response_serializer = GPUSerializer(instance)
+        
+        return Response({
+            'status': 'success',
+            'message': 'GPU registered successfully',
+            'data': response_serializer.data
+        }, status=status.HTTP_201_CREATED)
 
 
 class GPUUpdateView(generics.UpdateAPIView):
