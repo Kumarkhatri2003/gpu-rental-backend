@@ -99,16 +99,25 @@ class UserSerializer(serializers.ModelSerializer):
     
 class HostProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
-    user_id = serializers.UUIDField(write_only = True)
+    user_id = serializers.UUIDField(write_only=True, required=False)
     
     class Meta:
         model = HostProfile
         fields = '__all__'
-        read_only_fields = ('id', 'created_at', 'updated_at', 'user')
+        read_only_fields = (
+            'id', 'created_at', 'updated_at', 'user',
+            'total_earnings', 'pending_payout', 'total_sessions',
+            'total_rental_hours', 'reliability_score', 'penalty_points',
+            'uptime_percentage', 'last_heartbeat', 'offline_since',
+            'heartbeat_count'
+        )
         
     def create(self, validated_data):
-        user_id = validated_data.pop('user_id')
-        user = User.objects.get(id = user_id)
+        user_id = validated_data.pop('user_id', None)
+        if user_id:
+            user = User.objects.get(id=user_id)
+        else:
+            user = self.context['request'].user
         return HostProfile.objects.create(user=user, **validated_data)
     
 

@@ -1,5 +1,3 @@
-# users/models.py - FIXED VERSION
-
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
@@ -151,7 +149,15 @@ class HostProfile(models.Model):
     reliability_score = models.IntegerField(default=100)
     total_sessions = models.IntegerField(default=0)
     penalty_points = models.IntegerField(default=0)
-    total_earnings = models.FloatField(default=0.0)
+    total_earnings = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    pending_payout = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    total_rental_hours = models.FloatField(default=0.0)
+    
+    # ===== HOST PREFERENCES & SETTINGS =====
+    auto_accept = models.BooleanField(default=False)
+    max_rental_hours = models.IntegerField(default=24)
+    notification_preferences = models.JSONField(default=dict, blank=True)
+    availability_schedule = models.JSONField(default=dict, blank=True)
     
     # ===== LOCATION & NETWORK =====
     location = models.CharField(max_length=255, blank=True, null=True)
@@ -197,6 +203,34 @@ class HostProfile(models.Model):
         self.last_heartbeat = timezone.now()
         self.heartbeat_count += 1
         self.status = 'online'
+        self.save()
+
+    def apply_penalty(self, points, reason, session=None):
+        """Apply penalty points, record penalty log, and adjust status/score"""
+        from sessions.models import HostPenaltyLog
+        self.penalty_points += points
+        self.reliability_score = max(0, 100 - (self.penalty_points * 2))
+        
+        if self.penalty_points >= 100:
+            self.status = 'suspended'
+        elif self.penalty_points >= 50 and self.status not in ['suspended']:
+            self.status = 'restricted'
+            
+        self.save()
+        
+        return HostPenaltyLog.objects.create(
+            host=self,
+            session=session,
+            penalty_points=points,
+            reason=reason
+        )
+
+    def update_earnings(self, net_amount, hours=0.0):
+        """Update host earnings and rental stats"""
+        from decimal import Decimal
+        self.total_earnings = Decimal(str(self.total_earnings or '0.00')) + Decimal(str(net_amount))
+        self.total_rental_hours += float(hours)
+        self.total_sessions += 1
         self.save()
 
 
