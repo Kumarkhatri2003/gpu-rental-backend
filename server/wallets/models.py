@@ -37,49 +37,56 @@ class Wallet(models.Model):
     @property
     def available_balance(self):
         """Balance available for new rentals"""
-        return self.balance - self.hold_amount
+        from decimal import Decimal
+        return Decimal(str(self.balance)) - Decimal(str(self.hold_amount))
     
-    def add_funds (self, amount):
+    def add_funds(self, amount):
         """Add funds to wallet"""
-        
-        if amount <= 0:
+        from decimal import Decimal
+        amount_dec = Decimal(str(amount))
+        if amount_dec <= 0:
             raise ValueError("Amount must be positive")
         
-        self.balance += amount
+        self.balance = Decimal(str(self.balance)) + amount_dec
         self.save()
         
         return self.balance
     
     def deduct_funds(self, amount):
         """Deduct funds from wallet"""
+        from decimal import Decimal
+        amount_dec = Decimal(str(amount))
+        if amount_dec <= 0:
+            raise ValueError("Amount must be positive")
         
-        if amount <= 0:
-            raise ValueError ("Amount must be positive")
-        
-        if amount > self.available_balance:
+        if amount_dec > self.available_balance:
             raise ValueError("Insufficient balance")
         
-        self.balance -= amount
+        self.balance = Decimal(str(self.balance)) - amount_dec
         self.save()
         return self.balance
     
     def hold_funds(self, amount):
         """Hold funds for a rental"""
-        if amount <= 0:
+        from decimal import Decimal
+        amount_dec = Decimal(str(amount))
+        if amount_dec <= 0:
             raise ValueError("Amount must be positive")
-        if amount > self.available_balance:
+        if amount_dec > self.available_balance:
             raise ValueError("Insufficient balance")
-        self.hold_amount += amount
+        self.hold_amount = Decimal(str(self.hold_amount)) + amount_dec
         self.save()
         return self.hold_amount
     
     def release_hold(self, amount):
         """Release held funds"""
-        if amount <= 0:
+        from decimal import Decimal
+        amount_dec = Decimal(str(amount))
+        if amount_dec <= 0:
             raise ValueError("Amount must be positive")
-        if amount > self.hold_amount:
+        if amount_dec > Decimal(str(self.hold_amount)):
             raise ValueError("Hold amount exceeds available hold")
-        self.hold_amount -= amount
+        self.hold_amount = Decimal(str(self.hold_amount)) - amount_dec
         self.save()
         return self.hold_amount
     
