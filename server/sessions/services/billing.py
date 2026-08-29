@@ -95,6 +95,26 @@ class BillingService:
         
         host_wallet.balance += host_earnings
         host_wallet.save()
+
+        # Update session platform fee
+        session.platform_fee = float(platform_fee)
+        session.save(update_fields=['platform_fee'])
+
+        # Create HostEarning record
+        from sessions.models import HostEarning
+        HostEarning.objects.create(
+            host=session.host,
+            session=session,
+            amount=actual_cost,
+            platform_fee=platform_fee,
+            net_amount=host_earnings,
+            status='completed',
+            paid_at=timezone.now()
+        )
+
+        # Update HostProfile stats
+        duration_hours = session.duration_hours or session.get_duration_in_hours()
+        session.host.update_earnings(host_earnings, hours=duration_hours)
         
         # Record transactions
         Transaction.objects.create(

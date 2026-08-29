@@ -185,3 +185,66 @@ class RelayPort(models.Model):
         self.leased_to_session_id = None
         self.released_at = timezone.now()
         self.save()
+
+
+class HostEarning(models.Model):
+    """Track host earnings per session"""
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    host = models.ForeignKey('users.HostProfile', on_delete=models.CASCADE, related_name='earnings')
+    session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='host_earnings')
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    platform_fee = models.DecimalField(max_digits=12, decimal_places=2)
+    net_amount = models.DecimalField(max_digits=12, decimal_places=2)
+    
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('withdrawn', 'Withdrawn'),
+        ('cancelled', 'Cancelled'),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='completed')
+    created_at = models.DateTimeField(auto_now_add=True)
+    paid_at = models.DateTimeField(blank=True, null=True)
+    
+    class Meta:
+        db_table = 'host_earnings'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['host', '-created_at']),
+            models.Index(fields=['status']),
+        ]
+    
+    def __str__(self):
+        return f"Earning {self.id} - Host {self.host.user.email} - {self.net_amount}"
+
+
+class HostPenaltyLog(models.Model):
+    """Track host penalties and appeals"""
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    host = models.ForeignKey('users.HostProfile', on_delete=models.CASCADE, related_name='penalties')
+    session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True, blank=True, related_name='penalties')
+    penalty_points = models.IntegerField()
+    reason = models.TextField()
+    
+    APPEAL_STATUS_CHOICES = [
+        ('none', 'None'),
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    appeal_status = models.CharField(max_length=20, choices=APPEAL_STATUS_CHOICES, default='none')
+    appeal_reason = models.TextField(blank=True, null=True)
+    appealed_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'host_penalties'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['host', '-created_at']),
+        ]
+    
+    def __str__(self):
+        return f"Penalty {self.penalty_points} pts - Host {self.host.user.email}"

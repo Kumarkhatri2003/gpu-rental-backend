@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Session, SessionMetric, RelayPort
+from .models import Session, SessionMetric, RelayPort, HostEarning, HostPenaltyLog
 
 
 class SessionSerializer(serializers.ModelSerializer):
@@ -66,3 +66,46 @@ class RelayPortSerializer(serializers.ModelSerializer):
     class Meta:
         model = RelayPort
         fields = '__all__'
+
+
+class HostEarningSerializer(serializers.ModelSerializer):
+    gpu_name = serializers.CharField(source='session.gpu.gpu_name', read_only=True)
+    session_id = serializers.CharField(source='session.id', read_only=True)
+    duration_hours = serializers.FloatField(source='session.duration_hours', read_only=True)
+    completed_at = serializers.DateTimeField(source='session.end_time', read_only=True)
+    
+    class Meta:
+        model = HostEarning
+        fields = (
+            'id', 'session_id', 'gpu_name', 'amount', 'platform_fee',
+            'net_amount', 'status', 'duration_hours', 'created_at',
+            'paid_at', 'completed_at'
+        )
+        read_only_fields = fields
+
+
+class HostPenaltyLogSerializer(serializers.ModelSerializer):
+    session_id = serializers.CharField(source='session.id', read_only=True, allow_null=True)
+    
+    class Meta:
+        model = HostPenaltyLog
+        fields = (
+            'id', 'session_id', 'penalty_points', 'reason',
+            'appeal_status', 'appeal_reason', 'appealed_at', 'created_at'
+        )
+        read_only_fields = ('id', 'session_id', 'penalty_points', 'reason', 'created_at')
+
+
+class HostPenaltyAppealSerializer(serializers.Serializer):
+    appeal_reason = serializers.CharField(required=True, min_length=10, max_length=1000)
+
+
+class HostSettingsSerializer(serializers.Serializer):
+    auto_accept = serializers.BooleanField(required=False)
+    max_rental_hours = serializers.IntegerField(required=False, min_value=1, max_value=720)
+    notification_preferences = serializers.DictField(required=False)
+    availability_schedule = serializers.DictField(required=False)
+
+
+class HostAutoAcceptSerializer(serializers.Serializer):
+    auto_accept = serializers.BooleanField(required=True)

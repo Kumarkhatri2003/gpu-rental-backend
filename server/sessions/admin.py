@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Session, SessionMetric, RelayPort
+from .models import Session, SessionMetric, RelayPort, HostEarning, HostPenaltyLog
 
 
 class SessionAdmin(admin.ModelAdmin):
@@ -17,6 +17,18 @@ class SessionAdmin(admin.ModelAdmin):
     )
 
 
+class HostEarningAdmin(admin.ModelAdmin):
+    list_display = ('id', 'host', 'session', 'amount', 'platform_fee', 'net_amount', 'status', 'created_at')
+    list_filter = ('status', 'created_at')
+    search_fields = ('host__user__email', 'session__id')
+
+
+class HostPenaltyLogAdmin(admin.ModelAdmin):
+    list_display = ('id', 'host', 'penalty_points', 'reason', 'appeal_status', 'created_at')
+    list_filter = ('appeal_status', 'created_at')
+    search_fields = ('host__user__email', 'reason')
+
+
 class SessionMetricAdmin(admin.ModelAdmin):
     list_display = ('session', 'gpu_utilization_pct', 'gpu_temperature_c', 'timestamp')
     list_filter = ('timestamp',)
@@ -29,5 +41,7 @@ class RelayPortAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Session, SessionAdmin)
+admin.site.register(HostEarning, HostEarningAdmin)
+admin.site.register(HostPenaltyLog, HostPenaltyLogAdmin)
 admin.site.register(SessionMetric, SessionMetricAdmin)
 admin.site.register(RelayPort, RelayPortAdmin)

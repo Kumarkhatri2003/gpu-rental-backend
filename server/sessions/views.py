@@ -378,3 +378,16 @@ class HostSessionCommandsView(APIView):
                 return Response({'command': 'STOP'})
         
         return Response({'command': 'NONE'})
+
+
+# Host Dashboard & Management Views
+from .host_views import (
+    HostDashboardView,
+    HostEarningsView,
+    HostEarningsSummaryView,
+    HostPenaltiesView,
+    HostPenaltyAppealView,
+    HostSettingsView,
+    HostAutoAcceptToggleView,
+    HostActivityView,
+)
