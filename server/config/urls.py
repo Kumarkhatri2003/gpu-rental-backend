@@ -9,6 +9,7 @@ urlpatterns = [
     path('api/wallets/', include('wallets.urls')),
     path('api/sessions/', include('sessions.urls')),
     path('api/host/', include('sessions.host_urls')),
+    path('api/notifications/', include('notifications.urls')),
     
     # OpenAPI Schema & API Documentation UI
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 import uuid
+from decimal import Decimal
 class GPU(models.Model):
     """GPU resource offered by a host"""
     
@@ -28,7 +29,7 @@ class GPU(models.Model):
     price_per_hour = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        validators=[MinValueValidator(0.01)],
+        validators=[MinValueValidator(Decimal('0.01'))],
         help_text="Price in NPR per hour"
     )
     

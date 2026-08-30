@@ -11,6 +11,8 @@ urlpatterns = [
     
     # Deposits & Withdrawals
     path('deposit/', views.DepositView.as_view(), name='deposit'),
+    path('deposit/confirm/', views.ConfirmPaymentView.as_view(), name='deposit-confirm'),
+    path('webhook/stripe/', views.StripeWebhookView.as_view(), name='stripe-webhook'),
     path('withdraw/', views.WithdrawView.as_view(), name='withdraw'),
     
     # Transactions
