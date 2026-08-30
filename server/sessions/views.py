@@ -79,6 +79,7 @@ class CreateSessionView(APIView):
             host=host,
             renter=request.user,
             status='pending',
+            relay_server_ip=RelayService.get_relay_host(),
             relay_server_port=port_info['port'],
             total_amount=total_amount,
             duration_hours=duration_hours,
@@ -275,15 +276,17 @@ class HostSessionStatusUpdateView(APIView):
         if status_value == 'FAILED':
             session.status = 'failed'
             session.error_message = error_message or 'Host reported failure'
+            session.termination_reason = 'failed'
             session.save()
-            # Release funds
-            from wallets.models import Wallet
-            wallet = Wallet.objects.get(user=session.renter)
-            wallet.hold_amount -= session.total_amount
-            wallet.save()
+            # Release funds properly via BillingService
+            BillingService.release_hold(session)
             # Release port
             if session.relay_port_obj:
                 session.relay_port_obj.release()
+            
+            # Send notification to renter
+            from notifications.services import NotificationService
+            NotificationService.notify_session_terminated(session, session.error_message)
             return Response({'status': 'updated'})
         
         # Map status values
@@ -298,12 +301,17 @@ class HostSessionStatusUpdateView(APIView):
         
         if status_value == 'ACTIVE':
             session.active_time = timezone.now()
+            session.relay_server_ip = session.relay_server_ip or RelayService.get_relay_host()
             session.ssh_connection_string = f"ssh renter@{session.relay_server_ip} -p {session.relay_server_port}"
             
             # Mark GPU as rented
             session.gpu.is_available = False
             session.gpu.current_session_id = session.id
             session.gpu.save()
+            
+            # Send notification to renter that session is live
+            from notifications.services import NotificationService
+            NotificationService.notify_session_started(session)
         
         session.save()
         
