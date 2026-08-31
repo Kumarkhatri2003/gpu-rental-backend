@@ -64,12 +64,20 @@ class GPUSortFilter(filters.BaseFilterBackend):
         sort_by = request.query_params.get('sort_by', 'price')
         sort_order = request.query_params.get('sort_order', 'asc')
         
+        if sort_by == 'rating':
+            from django.db.models import Avg, Value, FloatField
+            from django.db.models.functions import Coalesce
+            queryset = queryset.annotate(
+                avg_rating=Coalesce(Avg('reviews__rating'), Value(0.0), output_field=FloatField())
+            )
+            field = '-avg_rating' if sort_order == 'desc' else 'avg_rating'
+            return queryset.order_by(field)
+
         # Map sort fields to model fields
         sort_map = {
             'price': 'price_per_hour',
             'vram': 'vram_gb',
             'uptime': 'host__uptime_percentage',
-            'rating': 'rating',  # Will be added when reviews app is built
             'created': 'created_at',
             'sessions': 'total_sessions',
             'earnings': 'total_earnings',

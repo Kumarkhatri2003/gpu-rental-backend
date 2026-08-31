@@ -28,6 +28,8 @@ class Notification(models.Model):
         ('welcome', 'Welcome'),
         ('system_alert', 'System Alert'),
         ('penalty_applied', 'Penalty Applied'),
+        ('review_received', 'Review Received'),
+        ('review_response', 'Host Responded to Review'),
     ]
     type = models.CharField(max_length=50, choices=NOTIFICATION_TYPES)
     
