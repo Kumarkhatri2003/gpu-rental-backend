@@ -11,6 +11,7 @@ urlpatterns = [
     path('api/host/', include('sessions.host_urls')),
     path('api/notifications/', include('notifications.urls')),
     path('api/reviews/', include('reviews.urls')),
+    path('api/dashboard/', include('dashboard.urls')),
     
     # OpenAPI Schema & API Documentation UI
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
