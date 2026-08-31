@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'notifications',
     'reviews',
     'dashboard',
+    'admin_panel',
     
     # Third-party Apps
     'rest_framework',
@@ -214,3 +215,10 @@ NOTIFICATION_TYPES = [
     'review_received',
     'review_response',
 ]
+
+# Platform Identity
+PLATFORM_NAME = os.getenv('PLATFORM_NAME', 'GPU Resource Provisioning & Rental Platform')
+
+# Admin settings
+ADMIN_SITE_HEADER = f"{PLATFORM_NAME} Admin"
+ADMIN_SITE_TITLE = f"{PLATFORM_NAME} Administration"

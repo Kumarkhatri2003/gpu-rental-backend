@@ -43,6 +43,7 @@ def send_password_reset_email(user, token):
     """Send password reset email"""
     reset_url = f"{settings.FRONTEND_URL}/reset-password?token={token}"
     
+    platform_name = getattr(settings, 'PLATFORM_NAME', 'GPU Rental Platform')
     subject = 'Password Reset Request'
     message = f"""
     Hello {user.full_name},
@@ -57,7 +58,7 @@ def send_password_reset_email(user, token):
     If you didn't request this, please ignore this email.
     
     Thanks,
-    Labhya Compute Team
+    {platform_name} Team
     """
     
     send_mail(
@@ -72,6 +73,7 @@ def send_password_reset_email(user, token):
 def send_email_verification_email(user, token):
     """Send email verification email"""
     verify_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
+    platform_name = getattr(settings, 'PLATFORM_NAME', 'GPU Rental Platform')
     
     subject = 'Verify Your Email Address'
     message = f"""
@@ -85,7 +87,7 @@ def send_email_verification_email(user, token):
     This link will expire in 7 days.
     
     Thanks,
-    Labhya Compute Team
+    {platform_name} Team
     """
     
     send_mail(
