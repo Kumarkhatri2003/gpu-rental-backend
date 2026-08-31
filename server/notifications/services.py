@@ -143,6 +143,37 @@ class NotificationService:
         )
     
     # ========================================
+    # REVIEW NOTIFICATIONS
+    # ========================================
+    
+    @staticmethod
+    def notify_review_received(host_user, review):
+        return NotificationService.create_notification(
+            user=host_user,
+            type='review_received',
+            title='⭐ New Review Received',
+            message=f'You received a {review.rating}-star review for {review.gpu.gpu_name if review.gpu else "your GPU"}.',
+            data={
+                'review_id': str(review.id),
+                'rating': review.rating,
+                'session_id': str(review.session_id) if review.session_id else None
+            }
+        )
+
+    @staticmethod
+    def notify_review_response(renter_user, review):
+        return NotificationService.create_notification(
+            user=renter_user,
+            type='review_response',
+            title='💬 Host Responded to Your Review',
+            message=f'Host responded to your review on {review.gpu.gpu_name if review.gpu else "their GPU"}.',
+            data={
+                'review_id': str(review.id),
+                'session_id': str(review.session_id) if review.session_id else None
+            }
+        )
+
+    # ========================================
     # GENERAL NOTIFICATIONS
     # ========================================
     
@@ -155,3 +186,4 @@ class NotificationService:
             message='Start renting GPUs or register your hardware to earn money.',
             data={}
         )
+

@@ -29,11 +29,13 @@ class GPUSerializer(serializers.ModelSerializer):
             'total_sessions', 'created_at', 'updated_at'
         )
         
-    def get_average_rating(self,obj):
+    def get_average_rating(self, obj):
         """Calculate average rating from reviews"""
-        # Will be implemented when reviews app is build
-        
-        return None
+        from reviews.models import Review
+        from django.db.models import Avg
+        result = Review.objects.filter(gpu=obj).aggregate(avg_rating=Avg('rating'))
+        avg = result.get('avg_rating')
+        return round(avg, 2) if avg is not None else None
     
     def validate_price_per_hour(self, value):
         """Validate price per hour"""

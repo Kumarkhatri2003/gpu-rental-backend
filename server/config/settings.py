@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'wallets',
     'sessions',
     'notifications',
+    'reviews',
     
     # Third-party Apps
     'rest_framework',
@@ -209,4 +210,6 @@ NOTIFICATION_TYPES = [
     'wallet_debited',
     'welcome',
     'penalty_applied',
+    'review_received',
+    'review_response',
 ]
