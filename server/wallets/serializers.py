@@ -35,6 +35,10 @@ class DepositSerializer(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=12, decimal_places=2, min_value=Decimal('0.01'))
     payment_method = serializers.CharField(max_length=50, required=False, default='stripe')
     payment_token = serializers.CharField(max_length=255, required=False, allow_blank=True)
+    card_number = serializers.CharField(max_length=50, required=False, allow_blank=True)
+    promo_code = serializers.CharField(max_length=50, required=False, allow_blank=True)
+    simulate_failure = serializers.BooleanField(required=False, default=False)
+    failure_reason = serializers.CharField(max_length=255, required=False, allow_blank=True)
 
 
 class WithdrawSerializer(serializers.Serializer):

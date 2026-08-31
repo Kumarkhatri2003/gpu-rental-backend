@@ -5,6 +5,11 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from decimal import Decimal
 import uuid
+from notifications.services import NotificationService
+from .services.payment import PaymentService
+import logging
+
+logger = logging.getLogger(__name__)
 
 from .models import Wallet, Transaction
 from .serializers import (
@@ -53,6 +58,14 @@ class DepositView(APIView):
                     description=f"Deposit via {payment_method}"
                 )
             
+            tx_data = None
+            if result.get('transaction_id'):
+                try:
+                    tx_obj = Transaction.objects.get(id=result['transaction_id'])
+                    tx_data = TransactionSerializer(tx_obj).data
+                except Transaction.DoesNotExist:
+                    pass
+
             return Response({
                 'status': 'success',
                 'message': 'Deposit initiated' if result.get('mode') == 'stripe_intent' else 'Deposit completed',
@@ -95,6 +108,39 @@ class ConfirmPaymentView(APIView):
                 'status': 'error',
                 'message': str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            result = PaymentService.confirm_payment_intent(payment_intent_id)
+            if result.get('status') == 'success':
+                NotificationService.notify_wallet_credited(
+                    user=request.user,
+                    amount=result['amount'],
+                    description="Stripe Deposit"
+                )
+            return Response({
+                'status': 'success',
+                'data': result
+            })
+        except Exception as e:
+            return Response({
+                'status': 'error',
+                'message': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class StripeWebhookView(APIView):
+    """Receive and process Stripe Webhooks"""
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request):
+        payload = request.body
+        sig_header = request.META.get('HTTP_STRIPE_SIGNATURE', '')
+        
+        try:
+            result = PaymentService.handle_webhook_event(payload, sig_header)
+            return Response(result, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class StripeWebhookView(APIView):
