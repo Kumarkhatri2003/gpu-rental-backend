@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useAuthStore } from "@/stores/auth-store";
 import { toast } from "sonner";
+import { MarketplaceGPU, normalizeGpus, normalizeGpu } from "@/types/gpu";
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
@@ -29,11 +30,6 @@ api.interceptors.response.use(
       // Auto logout on 401
       useAuthStore.getState().logout();
       toast.error("Session expired. Please log in again.");
-      
-      // Optionally redirect to login, but handle hydration/SSR issues carefully
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
-      }
     }
     
     return Promise.reject(error);
@@ -52,7 +48,6 @@ export const getDashboardStats = async () => {
 
 export { getWalletBalance, depositFunds, getWalletTransactions } from "./wallet";
 export { getSessions, stopSession, getSessionById } from "./sessions";
-export * from "./host";
 
 export const getAvailableGpus = async () => {
   await delay(500);
@@ -86,4 +81,3 @@ export const getGpuById = async (id: string | number): Promise<MarketplaceGPU | 
     return all.find((g) => String(g.id) === String(id)) || null;
   }
 };
-

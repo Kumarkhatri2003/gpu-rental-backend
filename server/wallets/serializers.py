@@ -32,9 +32,8 @@ class TransactionSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'user', 'created_at', 'completed_at', 'updated_at')
 
 class DepositSerializer(serializers.Serializer):
-    amount = serializers.DecimalField(max_digits=12, decimal_places=2, min_value=Decimal('0.01'), required=False, default=Decimal('1000.00'))
-    currency = serializers.CharField(max_length=10, required=False, default='NPR')
-    payment_method = serializers.CharField(max_length=50, required=False, default='simulated_card')
+    amount = serializers.DecimalField(max_digits=12, decimal_places=2, min_value=Decimal('0.01'))
+    payment_method = serializers.CharField(max_length=50, required=False, default='stripe')
     payment_token = serializers.CharField(max_length=255, required=False, allow_blank=True)
     card_number = serializers.CharField(max_length=50, required=False, allow_blank=True)
     promo_code = serializers.CharField(max_length=50, required=False, allow_blank=True)

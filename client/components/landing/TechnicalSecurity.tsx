@@ -1,110 +1,95 @@
-import { ShieldCheck, Server, ArrowRight } from "lucide-react";
+import { ShieldCheck, Server, ArrowRight, Lock } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 export function TechnicalSecurity() {
   return (
-    <section className="py-24 bg-[#0a0a0a] relative overflow-hidden">
-      <div className="absolute right-0 top-0 -z-10 h-[500px] w-[500px] rounded-full bg-[#2B55E8]/10 blur-[120px]"></div>
-      
+    <section className="py-24 bg-background border-b border-border/60 relative overflow-hidden">
       <div className="container mx-auto px-6 lg:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>
-            <div className="inline-flex items-center rounded-full border border-[#2B55E8]/30 bg-[#2B55E8]/10 px-3 py-1.5 text-[13px] font-medium text-[#a8bbff] mb-6">
+            <div className="inline-flex items-center rounded-full border border-primary/25 bg-primary/10 px-3.5 py-1.5 text-xs font-semibold text-primary mb-6 shadow-xs">
               <ShieldCheck className="w-4 h-4 mr-2" />
-              Enterprise-grade Isolation
+              <span>Enterprise-Grade Security Model</span>
             </div>
             
-            <h2 className="text-[32px] md:text-[40px] font-bold tracking-tight text-white mb-6">
-              Your compute environment stays isolated.
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-6">
+              Your compute environment stays completely isolated.
             </h2>
             
-            <p className="text-[16px] text-[#d4d4d4] mb-8 leading-relaxed">
-              We&apos;ve built Labhya Compute with security from the ground up. You receive a fully isolated Ubuntu environment, ensuring both your code and the host&apos;s system remain secure and separate.
+            <p className="text-base text-muted-foreground mb-8 leading-relaxed">
+              We&apos;ve built tero gpu de malai with security from the ground up. You receive a fully isolated Ubuntu environment, ensuring both your proprietary code and the host&apos;s system remain protected and separate.
             </p>
             
-            <ul className="space-y-4">
+            <ul className="space-y-4 text-sm">
               {[
-                "Host filesystems are completely inaccessible to renters",
-                "Workloads are containerized using Docker",
-                "Direct hardware passthrough for maximum GPU performance",
-                "Encrypted reverse SSH tunneling"
+                "Host filesystems are strictly inaccessible to renter containers",
+                "Workloads run inside sandboxed Ubuntu Docker containers",
+                "Direct hardware passthrough for near-native CUDA performance",
+                "Encrypted reverse SSH tunneling with per-session credentials"
               ].map((item, idx) => (
-                <li key={idx} className="flex items-start">
-                  <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center mr-3">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                <li key={idx} className="flex items-start gap-3">
+                  <div className="mt-0.5 w-5 h-5 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                   </div>
-                  <span className="text-[#d4d4d4] text-[15px]">{item}</span>
+                  <span className="text-foreground/90 font-medium">{item}</span>
                 </li>
               ))}
             </ul>
           </div>
 
           <div className="relative">
-            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-tr from-[#2B55E8]/20 to-transparent opacity-50 blur-xl"></div>
-            <div className="relative rounded-2xl border border-white/10 bg-[#0d1117] p-8 shadow-2xl">
-              <div className="flex flex-col space-y-2 font-mono text-[13px]">
+            <Card className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-2xl relative">
+              <div className="flex flex-col space-y-2.5 font-mono text-xs">
                 
-                <div className="flex items-center justify-center p-4 bg-white/5 rounded-lg border border-white/10">
-                  <span className="font-semibold text-white">Your Browser</span>
+                <div className="flex items-center justify-center p-3.5 bg-secondary/60 rounded-xl border border-border font-bold text-foreground">
+                  <span>Renter Terminal / IDE</span>
                 </div>
                 
-                <div className="flex justify-center py-1 text-white/30">
-                  <ArrowRight className="w-5 h-5 rotate-90" />
+                <div className="flex justify-center py-0.5 text-muted-foreground">
+                  <ArrowRight className="w-4 h-4 rotate-90 text-primary" />
                 </div>
                 
-                <div className="flex items-center justify-center p-4 bg-[#2B55E8]/20 text-[#a8bbff] rounded-lg border border-[#2B55E8]/30">
-                  <span className="font-semibold">Labhya Compute</span>
+                <div className="flex items-center justify-center p-3.5 bg-primary/10 text-primary rounded-xl border border-primary/25 font-bold">
+                  <span>tero gpu de malai Relay Gateway</span>
                 </div>
                 
-                <div className="flex justify-center py-1 text-white/30">
-                  <ArrowRight className="w-5 h-5 rotate-90" />
+                <div className="flex justify-center py-0.5 text-muted-foreground">
+                  <ArrowRight className="w-4 h-4 rotate-90 text-primary" />
                 </div>
                 
-                <div className="flex items-center justify-center p-4 bg-white/5 rounded-lg border border-white/10">
-                  <LockIcon />
-                  <span className="font-semibold text-white ml-2">Secure SSH Relay</span>
+                <div className="flex items-center justify-center p-3.5 bg-secondary/60 rounded-xl border border-border font-bold text-foreground gap-2">
+                  <Lock className="w-4 h-4 text-primary" />
+                  <span>Secure Reverse SSH Tunnel</span>
                 </div>
                 
-                <div className="flex justify-center py-1 text-white/30">
-                  <ArrowRight className="w-5 h-5 rotate-90" />
+                <div className="flex justify-center py-0.5 text-muted-foreground">
+                  <ArrowRight className="w-4 h-4 rotate-90 text-primary" />
                 </div>
                 
-                <div className="p-1 rounded-lg border-2 border-dashed border-[#2B55E8]/40 bg-[#121212]">
-                  <div className="flex flex-col space-y-2 p-3">
-                    <div className="text-[11px] text-center text-[#a8bbff] mb-1 uppercase tracking-wider font-semibold">Isolation Boundary</div>
-                    
-                    <div className="flex items-center justify-center p-3 bg-white/5 rounded-md border border-white/10">
-                      <span className="font-semibold text-white">Ubuntu Container</span>
-                    </div>
-                    
-                    <div className="flex items-center justify-center p-3 bg-white/5 rounded-md border border-white/10">
-                      <span className="font-semibold text-white">Docker Isolation</span>
-                    </div>
+                <div className="p-3.5 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 space-y-2">
+                  <div className="text-[10px] text-center text-primary font-bold uppercase tracking-wider">
+                    Container Sandbox Boundary
+                  </div>
+                  
+                  <div className="flex items-center justify-center p-2.5 bg-card rounded-lg border border-border text-foreground font-semibold text-xs">
+                    <span>Isolated Ubuntu Container</span>
                   </div>
                 </div>
 
-                <div className="flex justify-center py-1 text-white/30">
-                  <ArrowRight className="w-5 h-5 rotate-90" />
+                <div className="flex justify-center py-0.5 text-muted-foreground">
+                  <ArrowRight className="w-4 h-4 rotate-90 text-emerald-500" />
                 </div>
 
-                <div className="flex items-center justify-center p-4 bg-green-500/10 text-green-400 rounded-lg border border-green-500/20">
-                  <Server className="w-4 h-4 mr-2" />
-                  <span className="font-semibold">NVIDIA GPU</span>
+                <div className="flex items-center justify-center p-3.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-500/25 font-bold gap-2">
+                  <Server className="w-4 h-4" />
+                  <span>Dedicated NVIDIA GPU Passthrough</span>
                 </div>
 
               </div>
-            </div>
+            </Card>
           </div>
         </div>
       </div>
     </section>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-foreground">
-      <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
   );
 }

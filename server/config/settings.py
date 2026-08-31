@@ -31,7 +31,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users',
+    'gpus',
     'wallets',
+    'sessions',
+    'notifications',
     
     # Third-party Apps
     'rest_framework',
@@ -80,11 +83,11 @@ ASGI_APPLICATION = 'config.asgi.application'
 import sys
 
 # Database
-if 'test' in sys.argv or any('test' in arg for arg in sys.argv):
+if 'test' in sys.argv:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 else:
@@ -181,3 +184,29 @@ SIMPLE_JWT = {
 
 # CORS Configuration
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Relay Port and Host configuration
+RELAY_HOST = os.getenv('RELAY_HOST', '127.0.0.1')
+RELAY_PORT_START = int(os.getenv('RELAY_PORT_START', '40000'))
+RELAY_PORT_END = int(os.getenv('RELAY_PORT_END', '50000'))
+
+# Payment Gateway (Stripe) Configuration
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', '')
+STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY', '')
+STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', '')
+
+
+NOTIFICATION_TYPES = [
+    'session_started',
+    'session_ending',
+    'session_completed',
+    'session_terminated',
+    'refund_processed',
+    'payment_received',
+    'host_offline',
+    'new_session_request',
+    'wallet_credited',
+    'wallet_debited',
+    'welcome',
+    'penalty_applied',
+]
