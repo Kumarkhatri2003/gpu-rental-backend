@@ -83,8 +83,10 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.full_name
     
     def get_wallet_balance(self, obj):
-        # Will be implemented in wallet app
+        if hasattr(obj, 'wallet') and obj.wallet:
+            return float(obj.wallet.balance)
         return 0.00
+
     
     def get_is_host(self, obj):
         return obj.is_host

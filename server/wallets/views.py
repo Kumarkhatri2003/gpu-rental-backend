@@ -5,6 +5,11 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from decimal import Decimal
 import uuid
+from notifications.services import NotificationService
+from .services.payment import PaymentService
+import logging
+
+logger = logging.getLogger(__name__)
 
 from .models import Wallet, Transaction
 from .serializers import (
@@ -24,62 +29,144 @@ class WalletView(generics.RetrieveAPIView):
         return wallet
 
 
+
+
+class SimulatePaymentOptionsView(APIView):
+    """List available simulated payment methods and test card/voucher parameters"""
+    permission_classes = [permissions.AllowAny]
+    
+    def get(self, request):
+        simulation_data = PaymentService.get_simulation_methods()
+        return Response({
+            'status': 'success',
+            'data': simulation_data
+        })
+
+
 class DepositView(APIView):
-    """Deposit funds into wallet"""
+    """Deposit funds into wallet via simulation engine or Stripe gateway"""
     permission_classes = [permissions.IsAuthenticated]
     
-    @transaction.atomic
     def post(self, request):
         serializer = DepositSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
-        amount = serializer.validated_data['amount']
-        payment_method = serializer.validated_data.get('payment_method', 'stripe')
-        payment_token = serializer.validated_data.get('payment_token', '')
+        amount = serializer.validated_data.get('amount', Decimal('1000.00'))
+        currency = serializer.validated_data.get('currency', 'NPR')
+        payment_method = serializer.validated_data.get('payment_method', 'simulated_card')
+        card_number = serializer.validated_data.get('card_number', '')
+        promo_code = serializer.validated_data.get('promo_code', '')
+        simulate_failure = serializer.validated_data.get('simulate_failure', False)
+        failure_reason = serializer.validated_data.get('failure_reason', '')
         
-        # Create pending transaction
-        transaction_obj = Transaction.create_deposit(
-            user=request.user,
-            amount=amount,
-            reference_id=str(uuid.uuid4()),
-            metadata={
-                'payment_method': payment_method,
-                'payment_token': payment_token,
-            }
-        )
-        
-        # TODO: Integrate with payment gateway (Stripe/Razorpay/ESewa)
-        # For now, simulate successful payment
         try:
-            # Process payment
-            if payment_method == 'stripe':
-                # stripe.PaymentIntent.create(...)
-                pass
-            elif payment_method == 'razorpay':
-                # razorpay.Order.create(...)
-                pass
+            result = PaymentService.create_deposit_intent(
+                user=request.user,
+                amount=amount,
+                currency=currency,
+                payment_method=payment_method,
+                card_number=card_number,
+                promo_code=promo_code,
+                simulate_failure=simulate_failure,
+                failure_reason=failure_reason,
+            )
             
-            # On successful payment
-            wallet = request.user.wallet
-            wallet.add_funds(amount)
+            wallet, _ = Wallet.objects.get_or_create(user=request.user)
             
-            transaction_obj.complete()
+            if result.get('status') == 'failed':
+                tx_data = None
+                if result.get('transaction_id'):
+                    try:
+                        tx_obj = Transaction.objects.get(id=result['transaction_id'])
+                        tx_data = TransactionSerializer(tx_obj).data
+                    except Transaction.DoesNotExist:
+                        pass
+
+                return Response({
+                    'status': 'error',
+                    'message': result.get('reason', 'Payment declined during simulation'),
+                    'data': result,
+                    'wallet': WalletSerializer(wallet).data,
+                    'transaction': tx_data,
+                }, status=status.HTTP_400_BAD_REQUEST)
             
+            if result.get('mode') in ['direct_settled', 'simulated_settled']:
+                try:
+                    NotificationService.notify_wallet_credited(
+                        user=request.user,
+                        amount=float(result.get('amount', amount)),
+                        description=f"Deposit via {payment_method}"
+                    )
+                except Exception as notif_err:
+                    logger.warning(f"Notification sending error: {notif_err}")
+            
+            tx_data = None
+            if result.get('transaction_id'):
+                try:
+                    tx_obj = Transaction.objects.get(id=result['transaction_id'])
+                    tx_data = TransactionSerializer(tx_obj).data
+                except Transaction.DoesNotExist:
+                    pass
+
             return Response({
                 'status': 'success',
-                'message': f'Deposit of {amount} {wallet.currency} successful',
-                'data': {
-                    'transaction': TransactionSerializer(transaction_obj).data,
-                    'wallet': WalletSerializer(wallet).data,
-                }
-            }, status=status.HTTP_201_CREATED)
+                'message': 'Deposit completed successfully' if result.get('status') == 'success' else 'Deposit initiated',
+                'data': result,
+                'wallet': WalletSerializer(wallet).data,
+                'transaction': tx_data,
+            }, status=status.HTTP_201_CREATED if result.get('status') == 'success' else status.HTTP_200_OK)
             
         except Exception as e:
-            transaction_obj.fail(str(e))
             return Response({
                 'status': 'error',
-                'message': f'Payment failed: {str(e)}'
+                'message': str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ConfirmPaymentView(APIView):
+    """Confirm a completed payment intent and credit wallet"""
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def post(self, request):
+        payment_intent_id = request.data.get('payment_intent_id')
+        if not payment_intent_id:
+            return Response({
+                'status': 'error',
+                'message': 'payment_intent_id is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            result = PaymentService.confirm_payment_intent(payment_intent_id)
+            if result.get('status') == 'success':
+                NotificationService.notify_wallet_credited(
+                    user=request.user,
+                    amount=result['amount'],
+                    description="Stripe Deposit"
+                )
+            return Response({
+                'status': 'success',
+                'data': result
+            })
+        except Exception as e:
+            return Response({
+                'status': 'error',
+                'message': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class StripeWebhookView(APIView):
+    """Receive and process Stripe Webhooks"""
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request):
+        payload = request.body
+        sig_header = request.META.get('HTTP_STRIPE_SIGNATURE', '')
+        
+        try:
+            result = PaymentService.handle_webhook_event(payload, sig_header)
+            return Response(result, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class WithdrawView(APIView):

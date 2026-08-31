@@ -14,6 +14,5 @@ def create_user_wallet(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def save_user_wallet(sender, instance, **kwargs):
-    """Save wallet when user is saved"""
-    if hasattr(instance, 'wallet'):
-        instance.wallet.save()
+    """Save or create wallet when user is saved"""
+    Wallet.objects.get_or_create(user=instance)
