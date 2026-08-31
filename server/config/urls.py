@@ -12,6 +12,7 @@ urlpatterns = [
     path('api/notifications/', include('notifications.urls')),
     path('api/reviews/', include('reviews.urls')),
     path('api/dashboard/', include('dashboard.urls')),
+    path('api/admin/', include('admin_panel.urls')),
     
     # OpenAPI Schema & API Documentation UI
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
