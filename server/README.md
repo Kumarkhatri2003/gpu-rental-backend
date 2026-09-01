@@ -6,14 +6,49 @@ The backend handles user authentication, host node management, GPU listing, SSH 
 
 ---
 
+## 🚀 Live Deployment & API Documentation
+
+- 🌐 **Live API Base URL**: `https://gpu-rental-backend.onrender.com`
+- 📑 **Interactive Swagger UI**: [https://gpu-rental-backend.onrender.com/api/schema/swagger-ui/](https://gpu-rental-backend.onrender.com/api/schema/swagger-ui/)
+- 📖 **Redoc API Reference**: [https://gpu-rental-backend.onrender.com/api/schema/redoc/](https://gpu-rental-backend.onrender.com/api/schema/redoc/)
+- ⚙️ **Admin Panel**: `https://gpu-rental-backend.onrender.com/admin/`
+
+---
+
+## 🔌 Frontend & Host Daemon Integration
+
+### 1. Frontend Integration (Next.js / React / Vue)
+Set your frontend environment variable:
+```env
+NEXT_PUBLIC_API_URL=https://gpu-rental-backend.onrender.com/api
+```
+
+#### Authentication Header Format
+For all protected user endpoints, attach the JWT access token:
+```http
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+---
+
+### 2. Host Node / Daemon Integration (API Key Auth)
+For background host worker nodes and GPU agents:
+1. **Generate API Key**: `POST https://gpu-rental-backend.onrender.com/api/auth/host/api-key/` (with host JWT token).
+2. **Validate Key**: `POST https://gpu-rental-backend.onrender.com/api/auth/host/api-key/validate/`
+3. **Heartbeat & Telemetry**: Send heartbeats every 60 seconds to `POST https://gpu-rental-backend.onrender.com/api/gpus/heartbeat/`.
+
+---
+
 ## 📋 Table of Contents
 
+- [Live Deployment & API Documentation](#-live-deployment--api-documentation)
+- [Frontend & Host Daemon Integration](#-frontend--host-daemon-integration)
 - [Core Modules & Apps](#-core-modules--apps)
 - [Prerequisites](#-prerequisites)
 - [Local Setup & Installation](#-local-setup--installation)
 - [Running the Server](#-running-the-server)
 - [Running Tests](#-running-tests)
-- [API Documentation & Admin Access](#-api-documentation--admin-access)
 - [Endpoints Overview](#-endpoints-overview)
 - [Production & Free Tier Deployment](#-production--free-tier-deployment)
 
