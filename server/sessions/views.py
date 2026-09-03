@@ -5,6 +5,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from datetime import timedelta
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
 
 from .models import Session, SessionMetric
 from .serializers import (
@@ -17,12 +18,31 @@ from .services.relay import RelayService
 from .services.billing import BillingService
 
 
+# =============================================================================
 # RENTER VIEWS
+# =============================================================================
 
 class CreateSessionView(APIView):
     """Renter creates a new session"""
     permission_classes = [permissions.IsAuthenticated]
     
+    @extend_schema(
+        summary="Create a new GPU rental session",
+        description="Renter creates a new session by selecting a GPU and duration. Reserves wallet funds and puts session in pending state.",
+        request=CreateSessionSerializer,
+        responses={
+            201: inline_serializer(
+                name='CreateSessionResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'message': serializers.CharField(default='Session created successfully'),
+                    'data': SessionSerializer()
+                }
+            ),
+            400: OpenApiResponse(description="Insufficient wallet balance, GPU unavailable, or invalid data"),
+            503: OpenApiResponse(description="No relay ports available")
+        }
+    )
     @transaction.atomic
     def post(self, request):
         serializer = CreateSessionSerializer(data=request.data)
@@ -121,6 +141,13 @@ class SessionListView(generics.ListAPIView):
     serializer_class = SessionSerializer
     permission_classes = [permissions.IsAuthenticated]
     
+    @extend_schema(
+        summary="List user rental sessions",
+        description="Retrieve all sessions created by the authenticated renter."
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+    
     def get_queryset(self):
         return Session.objects.filter(renter=self.request.user)
 
@@ -131,6 +158,13 @@ class SessionDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated, IsSessionOwner]
     lookup_field = 'id'
     
+    @extend_schema(
+        summary="Retrieve session details",
+        description="Fetch real-time details, connection credentials, and telemetry of a specific session."
+    )
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+    
     def get_queryset(self):
         return Session.objects.all()
 
@@ -139,6 +173,36 @@ class StopSessionView(APIView):
     """Renter stops a session"""
     permission_classes = [permissions.IsAuthenticated, IsSessionRenter]
     
+    @extend_schema(
+        summary="Stop an active session early",
+        description="Renter terminates an active session. Calculates actual usage time, charges wallet, and refunds unspent balance.",
+        request=None,
+        responses={
+            200: inline_serializer(
+                name='StopSessionResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'message': serializers.CharField(default='Session stopped successfully'),
+                    'data': inline_serializer(
+                        name='StopSessionData',
+                        fields={
+                            'session': SessionSerializer(),
+                            'billing': inline_serializer(
+                                name='BillingResult',
+                                fields={
+                                    'actual_cost': serializers.FloatField(),
+                                    'refund': serializers.FloatField(),
+                                    'host_earnings': serializers.FloatField(),
+                                    'platform_fee': serializers.FloatField()
+                                }
+                            )
+                        }
+                    )
+                }
+            ),
+            400: OpenApiResponse(description="Session is not in active status")
+        }
+    )
     @transaction.atomic
     def post(self, request, session_id):
         session = get_object_or_404(Session, id=session_id)
@@ -193,6 +257,29 @@ class SessionStatusView(APIView):
     """Get session status"""
     permission_classes = [permissions.IsAuthenticated, IsSessionOwner]
     
+    @extend_schema(
+        summary="Check session connectivity and time remaining",
+        description="Returns connection string, progress, and remaining time.",
+        responses={
+            200: inline_serializer(
+                name='SessionStatusResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'data': inline_serializer(
+                        name='SessionStatusData',
+                        fields={
+                            'session_id': serializers.CharField(),
+                            'status': serializers.CharField(),
+                            'ssh_connection': serializers.CharField(allow_null=True),
+                            'progress': serializers.FloatField(),
+                            'cost_so_far': serializers.FloatField(),
+                            'remaining_time': serializers.CharField(allow_null=True)
+                        }
+                    )
+                }
+            )
+        }
+    )
     def get(self, request, session_id):
         session = get_object_or_404(Session, id=session_id)
         
@@ -222,12 +309,34 @@ class SessionStatusView(APIView):
         return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
 
+# =============================================================================
 # HOST VIEWS
+# =============================================================================
 
 class HostPendingSessionsView(APIView):
     """Host polls for pending sessions"""
     permission_classes = [IsHostWithSession]
     
+    @extend_schema(
+        summary="Host daemon pending session poll",
+        description="Host agent polls to see if a renter has requested one of its GPUs.",
+        responses={
+            200: inline_serializer(
+                name='HostPendingSessionPayload',
+                fields={
+                    'session_id': serializers.CharField(),
+                    'gpu_id': serializers.CharField(),
+                    'gpu_name': serializers.CharField(),
+                    'duration_hours': serializers.IntegerField(),
+                    'work_protection': serializers.BooleanField(),
+                    'relay_server_ip': serializers.CharField(),
+                    'relay_server_port': serializers.IntegerField(),
+                    'relay_auth_key': serializers.CharField()
+                }
+            ),
+            204: OpenApiResponse(description="No pending sessions for this host")
+        }
+    )
     def get(self, request):
         host = request.user.host_profile
         
@@ -257,6 +366,18 @@ class HostSessionStatusUpdateView(APIView):
     """Host updates session status"""
     permission_classes = [IsHostWithSession]
     
+    @extend_schema(
+        summary="Host updates session status",
+        description="Host reports container lifecycle (STARTING, CONTAINER_RUNNING, TUNNEL_CONNECTING, ACTIVE, FAILED).",
+        request=SessionStatusUpdateSerializer,
+        responses={
+            200: inline_serializer(
+                name='StatusUpdateResponse',
+                fields={'status': serializers.CharField(default='updated')}
+            ),
+            403: OpenApiResponse(description="Not your session")
+        }
+    )
     def patch(self, request, session_id):
         session = get_object_or_404(Session, id=session_id)
         
@@ -322,6 +443,18 @@ class HostSessionHeartbeatView(APIView):
     """Host sends heartbeat for active session"""
     permission_classes = [IsHostWithSession]
     
+    @extend_schema(
+        summary="Host session telemetry heartbeat",
+        description="Host sends GPU temperature, memory, and utilization telemetry.",
+        request=SessionHeartbeatSerializer,
+        responses={
+            200: inline_serializer(
+                name='HeartbeatAck',
+                fields={'status': serializers.CharField(default='acknowledged')}
+            ),
+            400: OpenApiResponse(description="Session is not active")
+        }
+    )
     def post(self, request, session_id):
         session = get_object_or_404(Session, id=session_id)
         
@@ -348,54 +481,54 @@ class HostSessionHeartbeatView(APIView):
         
         # Save metrics
         if serializer.validated_data:
-            metric = SessionMetric.objects.create(
+            SessionMetric.objects.create(
                 session=session,
                 gpu_temperature_c=serializer.validated_data.get('gpu_temperature_c'),
                 gpu_utilization_pct=serializer.validated_data.get('gpu_utilization_pct'),
-                memory_used_mib=serializer.validated_data.get('memory_used_mib'),
+                memory_used_mib=serializer.validated_data.get('memory_used_mib')
             )
         
-        return Response({
-            'status': 'success',
-            'heartbeat_count': session.heartbeat_count
-        })
+        return Response({'status': 'acknowledged'})
 
 
 class HostSessionCommandsView(APIView):
-    """Host checks for commands"""
+    """Host gets commands to execute (e.g. stop session)"""
     permission_classes = [IsHostWithSession]
     
-    def get(self, request, session_id):
-        session = get_object_or_404(Session, id=session_id)
+    @extend_schema(
+        summary="Host poll for session control commands",
+        description="Host daemon polls for admin or renter initiated control commands (stop, restart, etc.).",
+        responses={
+            200: inline_serializer(
+                name='HostCommandsResponse',
+                fields={
+                    'commands': serializers.ListField(
+                        child=inline_serializer(
+                            name='HostCommandItem',
+                            fields={
+                                'action': serializers.CharField(),
+                                'session_id': serializers.CharField()
+                            }
+                        )
+                    )
+                }
+            )
+        }
+    )
+    def get(self, request):
+        host = request.user.host_profile
         
-        # Check host owns this session
-        if session.host.user_id != request.user.id:
-            return Response({
-                'status': 'error',
-                'message': 'Not your session'
-            }, status=status.HTTP_403_FORBIDDEN)
+        # Check for sessions that need to be stopped
+        stopping_sessions = Session.objects.filter(
+            host=host,
+            status='stopping'
+        )
         
-        # Check if session should stop
-        if session.status == 'stopping':
-            return Response({'command': 'STOP'})
+        commands = []
+        for session in stopping_sessions:
+            commands.append({
+                'action': 'stop',
+                'session_id': str(session.id)
+            })
         
-        # Check if duration expired
-        if session.status == 'active' and session.duration_hours:
-            elapsed = (timezone.now() - session.active_time).total_seconds() / 3600
-            if elapsed >= session.duration_hours:
-                return Response({'command': 'STOP'})
-        
-        return Response({'command': 'NONE'})
-
-
-# Host Dashboard & Management Views
-from .host_views import (
-    HostDashboardView,
-    HostEarningsView,
-    HostEarningsSummaryView,
-    HostPenaltiesView,
-    HostPenaltyAppealView,
-    HostSettingsView,
-    HostAutoAcceptToggleView,
-    HostActivityView,
-)
+        return Response({'commands': commands})

@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from datetime import timedelta
 from decimal import Decimal
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer, OpenApiParameter
 
 from .models import Session, SessionMetric, HostEarning, HostPenaltyLog
 from .serializers import (
@@ -23,6 +24,19 @@ class HostDashboardView(APIView):
     """Get comprehensive host dashboard data and metrics"""
     permission_classes = [IsHostWithSession]
     
+    @extend_schema(
+        summary="Host analytics dashboard",
+        description="Returns live sessions count, GPU fleet status, daily/weekly/monthly revenue totals, and per-GPU statistics.",
+        responses={
+            200: inline_serializer(
+                name='HostDashboardResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'data': serializers.DictField()
+                }
+            )
+        }
+    )
     def get(self, request):
         host = getattr(request.user, 'host_profile', None)
         if not host:
@@ -140,6 +154,19 @@ class HostEarningsView(APIView):
     """Get host earnings history and breakdown"""
     permission_classes = [IsHostWithSession]
     
+    @extend_schema(
+        summary="Host earnings and payouts breakdown",
+        description="Fetches total earnings, platform fee deduction records, and payout logs.",
+        responses={
+            200: inline_serializer(
+                name='HostEarningsResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'data': serializers.DictField()
+                }
+            )
+        }
+    )
     def get(self, request):
         host = request.user.host_profile
         
@@ -186,6 +213,22 @@ class HostEarningsSummaryView(APIView):
     """Get detailed time-series earnings summary (daily/weekly/monthly)"""
     permission_classes = [IsHostWithSession]
     
+    @extend_schema(
+        summary="Host time-series earnings analytics",
+        description="Returns earnings aggregated by day for trend charts.",
+        parameters=[
+            OpenApiParameter(name='days', type=int, default=30, description='Number of days history (e.g. 7, 30, 90)')
+        ],
+        responses={
+            200: inline_serializer(
+                name='HostEarningsSummaryResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'data': serializers.DictField()
+                }
+            )
+        }
+    )
     def get(self, request):
         host = request.user.host_profile
         days = int(request.query_params.get('days', 30))
@@ -246,6 +289,19 @@ class HostPenaltiesView(APIView):
     """Get host penalty history, reliability score, and appeal statuses"""
     permission_classes = [IsHostWithSession]
     
+    @extend_schema(
+        summary="Host penalties and reliability history",
+        description="Returns host reliability rating, penalty points, and violation records.",
+        responses={
+            200: inline_serializer(
+                name='HostPenaltiesResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'data': serializers.DictField()
+                }
+            )
+        }
+    )
     def get(self, request):
         host = request.user.host_profile
         
@@ -269,6 +325,22 @@ class HostPenaltyAppealView(APIView):
     """Submit an appeal for a host penalty"""
     permission_classes = [IsHostWithSession]
     
+    @extend_schema(
+        summary="Submit host penalty appeal",
+        description="Allows a host to dispute a reliability penalty.",
+        request=HostPenaltyAppealSerializer,
+        responses={
+            200: inline_serializer(
+                name='PenaltyAppealResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'message': serializers.CharField(),
+                    'data': HostPenaltyLogSerializer()
+                }
+            ),
+            400: OpenApiResponse(description="Appeal already submitted or invalid reason")
+        }
+    )
     def post(self, request, penalty_id):
         host = request.user.host_profile
         penalty = get_object_or_404(HostPenaltyLog, id=penalty_id, host=host)
@@ -298,6 +370,19 @@ class HostSettingsView(APIView):
     """Get and update host operational settings and preferences"""
     permission_classes = [IsHostWithSession]
     
+    @extend_schema(
+        summary="Retrieve host settings",
+        description="Fetch auto-accept mode, max rental duration, and notification preferences.",
+        responses={
+            200: inline_serializer(
+                name='HostSettingsResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'data': serializers.DictField()
+                }
+            )
+        }
+    )
     def get(self, request):
         host = request.user.host_profile
         
@@ -313,6 +398,21 @@ class HostSettingsView(APIView):
             }
         })
     
+    @extend_schema(
+        summary="Update host operational settings",
+        description="Update auto-accept mode, notification preferences, or schedule.",
+        request=HostSettingsSerializer,
+        responses={
+            200: inline_serializer(
+                name='HostSettingsUpdateResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'message': serializers.CharField(),
+                    'data': serializers.DictField()
+                }
+            )
+        }
+    )
     def patch(self, request):
         host = request.user.host_profile
         serializer = HostSettingsSerializer(data=request.data, partial=True)
@@ -348,6 +448,24 @@ class HostAutoAcceptToggleView(APIView):
     """Quick toggle or set auto-accept state for the host"""
     permission_classes = [IsHostWithSession]
     
+    @extend_schema(
+        summary="Toggle host auto-accept mode",
+        description="Enable or disable instant automatic session approval.",
+        request=HostAutoAcceptSerializer,
+        responses={
+            200: inline_serializer(
+                name='AutoAcceptResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'message': serializers.CharField(),
+                    'data': inline_serializer(
+                        name='AutoAcceptData',
+                        fields={'auto_accept': serializers.BooleanField()}
+                    )
+                }
+            )
+        }
+    )
     def post(self, request):
         host = request.user.host_profile
         
@@ -369,10 +487,101 @@ class HostAutoAcceptToggleView(APIView):
         })
 
 
+class HostSessionActionView(APIView):
+    """Host manually accepts or rejects a pending session (if auto-accept is off)"""
+    permission_classes = [IsHostWithSession]
+    
+    @extend_schema(
+        summary="Host accept or reject pending session",
+        description="Manual approval or rejection of a pending rental session.",
+        request=inline_serializer(
+            name='HostActionRequest',
+            fields={
+                'action': serializers.ChoiceField(choices=['accept', 'reject']),
+                'reason': serializers.CharField(required=False)
+            }
+        ),
+        responses={
+            200: inline_serializer(
+                name='HostActionResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'message': serializers.CharField(),
+                    'session_status': serializers.CharField()
+                }
+            ),
+            400: OpenApiResponse(description="Session not in pending state or invalid action")
+        }
+    )
+    def post(self, request, session_id):
+        host = request.user.host_profile
+        session = get_object_or_404(Session, id=session_id, host=host)
+        
+        if session.status != 'pending':
+            return Response({
+                'status': 'error',
+                'message': f'Cannot perform action on session with status: {session.status}'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        action = request.data.get('action')
+        if action not in ['accept', 'reject']:
+            return Response({
+                'status': 'error',
+                'message': "Action must be either 'accept' or 'reject'"
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        from notifications.services import NotificationService
+        from .services.billing import BillingService
+        
+        if action == 'accept':
+            return Response({
+                'status': 'success',
+                'message': 'Session accepted. Host agent should now initialize container.',
+                'session_status': session.status
+            })
+            
+        elif action == 'reject':
+            reason = request.data.get('reason', 'Host declined the rental request')
+            session.status = 'rejected'
+            session.error_message = reason
+            session.termination_reason = 'host_rejected'
+            session.save()
+            
+            BillingService.release_hold(session)
+            if session.relay_port_obj:
+                session.relay_port_obj.release()
+                
+            NotificationService.notify_session_terminated(session, f"Host declined session: {reason}")
+            
+            return Response({
+                'status': 'success',
+                'message': 'Session rejected and hold released',
+                'session_status': session.status
+            })
+
+
 class HostActivityView(APIView):
     """Recent chronological activity feed for host"""
     permission_classes = [IsHostWithSession]
     
+    @extend_schema(
+        summary="Host chronological activity timeline",
+        description="Returns unified feed of session requests, completions, and penalties.",
+        responses={
+            200: inline_serializer(
+                name='HostActivityFeedResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'data': inline_serializer(
+                        name='HostActivityData',
+                        fields={
+                            'activity': serializers.ListField(child=serializers.DictField())
+                        }
+                    )
+                }
+            )
+        }
+    )
     def get(self, request):
         host = request.user.host_profile
         limit = int(request.query_params.get('limit', 20))
