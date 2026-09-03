@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 from .models import Notification
 
 
@@ -15,6 +16,7 @@ class NotificationSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ('id', 'user', 'created_at', 'read_at')
     
+    @extend_schema_field(serializers.CharField())
     def get_time_ago(self, obj):
         from django.utils import timezone
         from datetime import timedelta
