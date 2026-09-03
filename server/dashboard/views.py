@@ -151,6 +151,11 @@ class HostDashboardView(APIView):
     """
     permission_classes = [IsHostOrAdmin]
 
+    @extend_schema(
+        summary="Host analytics overview",
+        description="Returns GPU fleet metrics, uptime, session statistics, and earnings trend.",
+        responses={200: DashboardSummarySerializer}
+    )
     def get(self, request):
         data = AnalyticsAggregator.get_host_dashboard_data(request.user)
         return Response(data, status=status.HTTP_200_OK)
@@ -162,6 +167,11 @@ class RenterDashboardView(APIView):
     """
     permission_classes = [IsRenterOrAdmin]
 
+    @extend_schema(
+        summary="Renter analytics overview",
+        description="Returns wallet balance, active rentals, total spend, and recent session history.",
+        responses={200: DashboardSummarySerializer}
+    )
     def get(self, request):
         data = AnalyticsAggregator.get_renter_dashboard_data(request.user)
         return Response(data, status=status.HTTP_200_OK)
@@ -174,6 +184,14 @@ class DashboardWidgetListCreateView(generics.ListCreateAPIView):
     """
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = DashboardWidgetSerializer
+
+    @extend_schema(summary="List user customized dashboard widgets")
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @extend_schema(summary="Create a custom dashboard widget")
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
     def get_queryset(self):
         # Auto initialize default widgets if none exist
@@ -189,6 +207,18 @@ class DashboardWidgetDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = DashboardWidgetSerializer
     lookup_field = 'id'
     lookup_url_kwarg = 'widget_id'
+
+    @extend_schema(summary="Get widget details")
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+    @extend_schema(summary="Update widget configuration or position")
+    def patch(self, request, *args, **kwargs):
+        return super().patch(request, *args, **kwargs)
+
+    @extend_schema(summary="Delete a widget")
+    def delete(self, request, *args, **kwargs):
+        return super().delete(request, *args, **kwargs)
 
     def get_queryset(self):
         return DashboardWidget.objects.filter(user=self.request.user)
