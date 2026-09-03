@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema_field
 from .models import Review
 from sessions.models import Session
 
@@ -38,6 +39,7 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
         )
         read_only_fields = fields
 
+    @extend_schema_field(serializers.CharField())
     def get_renter_name(self, obj):
         """Display renter full name or masked email for privacy"""
         if obj.renter.first_name or obj.renter.last_name:

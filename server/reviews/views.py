@@ -1,10 +1,10 @@
-from rest_framework import generics, status, permissions
+from rest_framework import generics, status, permissions, serializers
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes, OpenApiResponse, inline_serializer
 
 from .models import Review
 from .serializers import (
@@ -172,6 +172,16 @@ class ReviewHostResponseView(APIView):
     """
     permission_classes = [permissions.IsAuthenticated, IsReviewHost]
 
+    @extend_schema(
+        summary="Host reply to review",
+        description="Allows the GPU host to post a response comment to a renter's review.",
+        request=ReviewHostResponseSerializer,
+        responses={
+            200: ReviewDetailSerializer,
+            400: OpenApiResponse(description="Invalid response payload"),
+            403: OpenApiResponse(description="You are not the host for this review")
+        }
+    )
     def post(self, request, review_id):
         review = get_object_or_404(
             Review.objects.select_related('host__user', 'gpu', 'renter', 'session'),
@@ -280,6 +290,23 @@ class CanReviewSessionView(APIView):
     """
     permission_classes = [permissions.IsAuthenticated]
 
+    @extend_schema(
+        summary="Check review eligibility for session",
+        description="Returns whether the logged-in user rented and completed the session, and hasn't reviewed it yet.",
+        responses={
+            200: inline_serializer(
+                name='CanReviewResponse',
+                fields={
+                    'can_review': serializers.BooleanField(),
+                    'reason': serializers.CharField(required=False),
+                    'review_id': serializers.CharField(required=False),
+                    'session_id': serializers.CharField(required=False),
+                    'gpu_name': serializers.CharField(required=False),
+                    'host_id': serializers.CharField(required=False),
+                }
+            )
+        }
+    )
     def get(self, request, session_id):
         try:
             session = Session.objects.select_related('gpu', 'host').get(id=session_id)
