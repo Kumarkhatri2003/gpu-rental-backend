@@ -27,6 +27,20 @@ class GpuService {
       // Example regex to match temperature: "45C"
       final tempMatch = RegExp(r'(\d+)C').firstMatch(output);
 
+      String internetType = 'ethernet';
+      try {
+        final interfaces = await NetworkInterface.list(type: InternetAddressType.IPv4);
+        for (var interface in interfaces) {
+          final name = interface.name.toLowerCase();
+          if (name.contains('wi-fi') || name.contains('wlan') || name.contains('wireless')) {
+            internetType = 'wifi';
+            break;
+          }
+        }
+      } catch (_) {
+        // Fallback to ethernet if detection fails
+      }
+
       if (driverMatch != null && nameMatch != null) {
         return GpuInfo(
           name: nameMatch.group(1)?.trim() ?? 'Unknown',
@@ -34,6 +48,8 @@ class GpuService {
           driverVersion: driverMatch.group(1) ?? 'Unknown',
           cudaVersion: cudaMatch?.group(1) ?? 'Unknown',
           temperature: tempMatch != null ? '${tempMatch.group(1)}°C' : 'Unknown',
+          osVersion: Platform.operatingSystemVersion,
+          internetType: internetType,
         );
       }
       
@@ -46,3 +62,4 @@ class GpuService {
     }
   }
 }
+

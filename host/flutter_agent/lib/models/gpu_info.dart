@@ -4,6 +4,8 @@ class GpuInfo {
   final String driverVersion;
   final String cudaVersion;
   final String temperature;
+  final String osVersion;
+  final String internetType;
 
   GpuInfo({
     required this.name,
@@ -11,5 +13,8 @@ class GpuInfo {
     required this.driverVersion,
     required this.cudaVersion,
     required this.temperature,
+    required this.osVersion,
+    required this.internetType,
   });
 }
+
