@@ -1,4 +1,4 @@
-from rest_framework import generics, status, permissions, filters
+from rest_framework import generics, status, permissions, filters, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Count, Sum, Avg, Q
@@ -23,6 +23,9 @@ from rest_framework.pagination import PageNumberPagination
 from .permissions import IsAdminUser, IsAdminOrStaff
 
 
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer, OpenApiParameter
+
+
 class StandardAdminPagination(PageNumberPagination):
     page_size = 20
     page_size_query_param = 'page_size'
@@ -37,6 +40,11 @@ class AdminDashboardView(APIView):
     """Admin dashboard overview with comprehensive platform metrics"""
     permission_classes = [IsAdminUser]
     
+    @extend_schema(
+        summary="Admin platform overview dashboard",
+        description="Returns global platform statistics: user counts, active GPU sessions, revenue totals, platform fee collection, and recent activity logs.",
+        responses={200: AdminDashboardSerializer}
+    )
     def get(self, request):
         now = timezone.now()
         week_ago = now - timedelta(days=7)
@@ -239,6 +247,22 @@ class AdminTransactionRefundView(APIView):
     """Process admin refund for a rental payment transaction"""
     permission_classes = [IsAdminUser]
     
+    @extend_schema(
+        summary="Admin refund rental transaction",
+        description="Processes an administrative refund for a rental payment transaction, crediting the renter's wallet.",
+        request=None,
+        responses={
+            200: inline_serializer(
+                name='AdminRefundResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'message': serializers.CharField(),
+                    'refund_transaction_id': serializers.CharField()
+                }
+            ),
+            400: OpenApiResponse(description="Transaction not eligible for refund or already refunded")
+        }
+    )
     def post(self, request, id):
         transaction = get_object_or_404(Transaction.objects.select_related('user'), id=id)
         
@@ -350,6 +374,24 @@ class AdminReviewModerateView(APIView):
     """Moderate (verify / unverify / delete) a review"""
     permission_classes = [IsAdminUser]
     
+    @extend_schema(
+        summary="Moderate user review",
+        description="Admin can verify, unverify, or delete a review.",
+        request=inline_serializer(
+            name='AdminReviewModerateRequest',
+            fields={'action': serializers.ChoiceField(choices=['verify', 'unverify', 'delete'])}
+        ),
+        responses={
+            200: inline_serializer(
+                name='AdminReviewModerateResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'message': serializers.CharField()
+                }
+            ),
+            400: OpenApiResponse(description="Invalid moderation action")
+        }
+    )
     def patch(self, request, id):
         review = get_object_or_404(Review, id=id)
         action = request.data.get('action')  # 'verify', 'unverify', 'delete'
@@ -418,6 +460,20 @@ class SystemLogClearView(APIView):
     """Clear system logs"""
     permission_classes = [IsAdminUser]
     
+    @extend_schema(
+        summary="Clear system audit logs",
+        description="Deletes all system audit and event logs.",
+        request=None,
+        responses={
+            200: inline_serializer(
+                name='ClearLogsResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'message': serializers.CharField()
+                }
+            )
+        }
+    )
     def delete(self, request):
         count = SystemLog.objects.count()
         SystemLog.objects.all().delete()
