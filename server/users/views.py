@@ -1,5 +1,5 @@
 # users/views.py
-from rest_framework import generics, status, permissions, mixins
+from rest_framework import generics, status, permissions, mixins, serializers
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 import logging
+from drf_spectacular.utils import extend_schema, OpenApiResponse, inline_serializer
 
 from .models import User, HostProfile, PasswordResetToken
 from .serializers import (
@@ -33,6 +34,24 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = UserRegistrationSerializer
     permission_classes = [permissions.AllowAny]
     
+    @extend_schema(
+        summary="Register new user account",
+        description="Creates a new renter or host account with email, name, role, and password.",
+        responses={
+            201: inline_serializer(
+                name='RegisterSuccessResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'message': serializers.CharField(),
+                    'data': inline_serializer(
+                        name='RegisterUserData',
+                        fields={'user': UserSerializer()}
+                    )
+                }
+            ),
+            400: OpenApiResponse(description="Validation error (passwords don't match, email taken)")
+        }
+    )
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -55,6 +74,29 @@ class LoginView(generics.GenericAPIView):
     serializer_class = UserLoginSerializer
     permission_classes = [permissions.AllowAny]
     
+    @extend_schema(
+        summary="User login with JWT authentication",
+        description="Authenticates with email and password, returning JWT access token, refresh token, and host profile details.",
+        responses={
+            200: inline_serializer(
+                name='LoginSuccessResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'message': serializers.CharField(),
+                    'data': inline_serializer(
+                        name='LoginSuccessData',
+                        fields={
+                            'user': UserSerializer(),
+                            'host_profile': HostProfileSerializer(allow_null=True),
+                            'access_token': serializers.CharField(),
+                            'refresh_token': serializers.CharField()
+                        }
+                    )
+                }
+            ),
+            400: OpenApiResponse(description="Invalid email or password")
+        }
+    )
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -88,6 +130,23 @@ class LogoutView(generics.GenericAPIView):
     """
     permission_classes = [permissions.IsAuthenticated]
     
+    @extend_schema(
+        summary="User logout",
+        description="Blacklists JWT refresh token to revoke session.",
+        request=inline_serializer(
+            name='LogoutRequest',
+            fields={'refresh_token': serializers.CharField()}
+        ),
+        responses={
+            200: inline_serializer(
+                name='LogoutResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'message': serializers.CharField()
+                }
+            )
+        }
+    )
     def post(self, request, *args, **kwargs):
         try:
             refresh_token = request.data.get('refresh_token')
@@ -113,6 +172,27 @@ class RefreshTokenView(generics.GenericAPIView):
     """
     permission_classes = [permissions.AllowAny]
     
+    @extend_schema(
+        summary="Refresh JWT access token",
+        description="Takes a valid refresh token and returns a fresh short-lived access token.",
+        request=inline_serializer(
+            name='RefreshTokenRequest',
+            fields={'refresh_token': serializers.CharField()}
+        ),
+        responses={
+            200: inline_serializer(
+                name='RefreshTokenResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'data': inline_serializer(
+                        name='RefreshTokenData',
+                        fields={'access_token': serializers.CharField()}
+                    )
+                }
+            ),
+            401: OpenApiResponse(description="Invalid or expired refresh token")
+        }
+    )
     def post(self, request, *args, **kwargs):
         refresh_token = request.data.get('refresh_token')
         if not refresh_token:
@@ -144,6 +224,20 @@ class MeView(generics.RetrieveUpdateAPIView):
     """
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+    
+    @extend_schema(
+        summary="Get logged-in user profile",
+        description="Returns user details and host profile if applicable."
+    )
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+    
+    @extend_schema(
+        summary="Update logged-in user profile",
+        description="Update first name or last name."
+    )
+    def patch(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
     
     def get_object(self):
         return self.request.user
@@ -185,6 +279,20 @@ class ChangePasswordView(generics.GenericAPIView):
     serializer_class = ChangePasswordSerializer
     permission_classes = [permissions.IsAuthenticated]
     
+    @extend_schema(
+        summary="Change user password",
+        description="Verifies old password and updates to new password.",
+        responses={
+            200: inline_serializer(
+                name='ChangePasswordResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'message': serializers.CharField()
+                }
+            ),
+            400: OpenApiResponse(description="Incorrect old password or invalid new password")
+        }
+    )
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -214,6 +322,19 @@ class ForgotPasswordView(generics.GenericAPIView):
     serializer_class = ForgotPasswordSerializer
     permission_classes = [permissions.AllowAny]
     
+    @extend_schema(
+        summary="Request password reset email",
+        description="Sends a secure password reset token link to the user's registered email.",
+        responses={
+            200: inline_serializer(
+                name='ForgotPasswordResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'message': serializers.CharField()
+                }
+            )
+        }
+    )
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -240,6 +361,20 @@ class ResetPasswordView(generics.GenericAPIView):
     serializer_class = ResetPasswordSerializer
     permission_classes = [permissions.AllowAny]
     
+    @extend_schema(
+        summary="Reset password using token",
+        description="Verifies the email reset token and sets the new password.",
+        responses={
+            200: inline_serializer(
+                name='ResetPasswordResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'message': serializers.CharField()
+                }
+            ),
+            400: OpenApiResponse(description="Invalid or expired reset token")
+        }
+    )
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -282,6 +417,27 @@ class GenerateHostApiKeyView(generics.GenericAPIView):
     """
     permission_classes = [IsHostOrAdmin]
     
+    @extend_schema(
+        summary="Generate Host API Key",
+        description="Generates a unique API authentication key for the host's background daemon worker.",
+        request=None,
+        responses={
+            200: inline_serializer(
+                name='GenerateApiKeyResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'data': inline_serializer(
+                        name='ApiKeyData',
+                        fields={
+                            'api_key': serializers.CharField(),
+                            'message': serializers.CharField()
+                        }
+                    )
+                }
+            ),
+            403: OpenApiResponse(description="User does not have host role")
+        }
+    )
     def post(self, request, *args, **kwargs):
         user = request.user
         
@@ -310,6 +466,28 @@ class ValidateHostApiKeyView(generics.GenericAPIView):
     serializer_class = ValidateApiKeySerializer
     permission_classes = [permissions.AllowAny]
     
+    @extend_schema(
+        summary="Validate Host API Key",
+        description="Used by host daemons to verify their API key and mark their node online.",
+        responses={
+            200: inline_serializer(
+                name='ValidateApiKeyResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'data': inline_serializer(
+                        name='ValidateApiKeyData',
+                        fields={
+                            'user_id': serializers.CharField(),
+                            'email': serializers.CharField(),
+                            'role': serializers.CharField(),
+                            'is_host': serializers.BooleanField()
+                        }
+                    )
+                }
+            ),
+            401: OpenApiResponse(description="Invalid API key")
+        }
+    )
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -338,8 +516,6 @@ class ValidateHostApiKeyView(generics.GenericAPIView):
             }, status=status.HTTP_401_UNAUTHORIZED)
 
 
-
-
 class HostProfileView(generics.RetrieveUpdateAPIView):
     """
     Get and update host profile.
@@ -349,9 +525,16 @@ class HostProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = HostProfileSerializer
     permission_classes = [IsHostOrAdmin]
     
+    @extend_schema(summary="Retrieve host node profile")
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+    
+    @extend_schema(summary="Update host node profile")
+    def patch(self, request, *args, **kwargs):
+        return super().patch(request, *args, **kwargs)
+    
     def get_object(self):
         return get_object_or_404(HostProfile, user=self.request.user)
-
 
 
 class HostHeartbeatView(generics.GenericAPIView):
@@ -361,6 +544,27 @@ class HostHeartbeatView(generics.GenericAPIView):
     """
     permission_classes = [IsHostOrAdmin]
     
+    @extend_schema(
+        summary="Host node heartbeat ping",
+        description="Host daemon pings to refresh uptime and node connectivity.",
+        request=inline_serializer(
+            name='HostHeartbeatRequest',
+            fields={
+                'gpu_name': serializers.CharField(required=False),
+                'vram_total': serializers.CharField(required=False),
+                'driver_version': serializers.CharField(required=False)
+            }
+        ),
+        responses={
+            200: inline_serializer(
+                name='HostHeartbeatAck',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'data': serializers.DictField()
+                }
+            )
+        }
+    )
     def post(self, request, *args, **kwargs):
         user = request.user
         
@@ -401,6 +605,19 @@ class HostStatusView(generics.GenericAPIView):
     """
     permission_classes = [IsHostOrAdmin]
     
+    @extend_schema(
+        summary="Get host node online status",
+        description="Returns current status, uptime, and total sessions.",
+        responses={
+            200: inline_serializer(
+                name='HostStatusDataResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'data': serializers.DictField()
+                }
+            )
+        }
+    )
     def get(self, request, *args, **kwargs):
         user = request.user
         
@@ -424,6 +641,23 @@ class HostStatusView(generics.GenericAPIView):
             }
         })
     
+    @extend_schema(
+        summary="Set host node online/offline manually",
+        description="Allows host to toggle their status between online and offline.",
+        request=inline_serializer(
+            name='HostStatusToggleRequest',
+            fields={'status': serializers.ChoiceField(choices=['online', 'offline'])}
+        ),
+        responses={
+            200: inline_serializer(
+                name='HostStatusToggleResponse',
+                fields={
+                    'status': serializers.CharField(default='success'),
+                    'data': serializers.DictField()
+                }
+            )
+        }
+    )
     def post(self, request, *args, **kwargs):
         user = request.user
         status_value = request.data.get('status')
@@ -468,6 +702,7 @@ class AdminUserListView(
     serializer_class = UserSerializer
     permission_classes = [IsAdmin]
     
+    @extend_schema(summary="Admin list all users")
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
@@ -490,12 +725,15 @@ class AdminUserDetailView(
     lookup_field = 'id'
     lookup_url_kwarg = 'user_id'
     
+    @extend_schema(summary="Admin retrieve user details")
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
     
+    @extend_schema(summary="Admin update user details")
     def patch(self, request, *args, **kwargs):
         return self.partial_update(request, *args, **kwargs)
     
+    @extend_schema(summary="Admin soft-delete user")
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
     
