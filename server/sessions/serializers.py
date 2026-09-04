@@ -45,6 +45,9 @@ class CreateSessionSerializer(serializers.Serializer):
 class SessionStatusUpdateSerializer(serializers.Serializer):
     status = serializers.CharField(required=True)
     error_message = serializers.CharField(required=False, allow_blank=True)
+    ssh_connection_string = serializers.CharField(required=False, allow_blank=True)
+    relay_server_ip = serializers.CharField(required=False, allow_blank=True)
+    relay_server_port = serializers.IntegerField(required=False)
 
     def validate_status(self, value):
         val = value.strip().upper()

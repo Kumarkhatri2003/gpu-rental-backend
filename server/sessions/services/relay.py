@@ -36,7 +36,18 @@ class RelayService:
         ).order_by('port').first()
         
         if not port:
-            raise ValueError(f"No free relay ports available in range {start_port}-{end_port}")
+            # Automatically allocate and create the next unused port in range on-demand
+            used_ports = set(RelayPort.objects.filter(port__gte=start_port, port__lte=end_port).values_list('port', flat=True))
+            for p_num in range(start_port, end_port + 1):
+                if p_num not in used_ports:
+                    port = RelayPort.objects.create(
+                        port=p_num,
+                        status='free'
+                    )
+                    break
+            
+            if not port:
+                raise ValueError(f"No free relay ports available in range {start_port}-{end_port}")
         
         # Lease the port
         port.lease(session_id)

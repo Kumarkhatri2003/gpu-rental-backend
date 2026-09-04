@@ -425,10 +425,18 @@ class HostSessionStatusUpdateView(APIView):
         
         session.status = status_map.get(status_value, session.status)
         
+        if serializer.validated_data.get('relay_server_ip'):
+            session.relay_server_ip = serializer.validated_data['relay_server_ip']
+        if serializer.validated_data.get('relay_server_port'):
+            session.relay_server_port = serializer.validated_data['relay_server_port']
+            
         if status_value == 'ACTIVE':
             session.active_time = timezone.now()
-            session.relay_server_ip = session.relay_server_ip or RelayService.get_relay_host()
-            session.ssh_connection_string = f"ssh renter@{session.relay_server_ip} -p {session.relay_server_port}"
+            if serializer.validated_data.get('ssh_connection_string'):
+                session.ssh_connection_string = serializer.validated_data['ssh_connection_string']
+            else:
+                session.relay_server_ip = session.relay_server_ip or RelayService.get_relay_host()
+                session.ssh_connection_string = f"ssh renter@{session.relay_server_ip} -p {session.relay_server_port}"
             
             # Mark GPU as rented
             session.gpu.is_available = False
