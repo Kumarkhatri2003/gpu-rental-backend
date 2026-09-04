@@ -43,10 +43,15 @@ class CreateSessionSerializer(serializers.Serializer):
 
 
 class SessionStatusUpdateSerializer(serializers.Serializer):
-    status = serializers.ChoiceField(
-        choices=['STARTING', 'CONTAINER_RUNNING', 'TUNNEL_CONNECTING', 'ACTIVE', 'FAILED']
-    )
+    status = serializers.CharField(required=True)
     error_message = serializers.CharField(required=False, allow_blank=True)
+
+    def validate_status(self, value):
+        val = value.strip().upper()
+        allowed = ['PENDING', 'STARTING', 'CONTAINER_RUNNING', 'TUNNEL_CONNECTING', 'ACTIVE', 'STOPPING', 'COMPLETED', 'TERMINATED', 'FAILED']
+        if val not in allowed:
+            raise serializers.ValidationError(f"Invalid status '{value}'. Allowed: {allowed}")
+        return val
 
 
 class SessionHeartbeatSerializer(serializers.Serializer):

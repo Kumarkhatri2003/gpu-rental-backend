@@ -37,8 +37,7 @@ class DepositSerializer(serializers.Serializer):
     payment_token = serializers.CharField(max_length=255, required=False, allow_blank=True)
     card_number = serializers.CharField(max_length=50, required=False, allow_blank=True)
     promo_code = serializers.CharField(max_length=50, required=False, allow_blank=True)
-    simulate_failure = serializers.BooleanField(required=False, default=False)
-    failure_reason = serializers.CharField(max_length=255, required=False, allow_blank=True)
+
 
 
 class WithdrawSerializer(serializers.Serializer):

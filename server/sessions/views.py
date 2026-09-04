@@ -157,6 +157,8 @@ class SessionDetailView(generics.RetrieveAPIView):
     serializer_class = SessionSerializer
     permission_classes = [permissions.IsAuthenticated, IsSessionOwner]
     lookup_field = 'id'
+    lookup_url_kwarg = 'session_id'
+
     
     @extend_schema(
         summary="Retrieve session details",
@@ -391,7 +393,7 @@ class HostSessionStatusUpdateView(APIView):
         serializer = SessionStatusUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
-        status_value = serializer.validated_data['status']
+        status_value = serializer.validated_data['status'].upper()
         error_message = serializer.validated_data.get('error_message')
         
         if status_value == 'FAILED':
@@ -416,6 +418,9 @@ class HostSessionStatusUpdateView(APIView):
             'CONTAINER_RUNNING': 'container_running',
             'TUNNEL_CONNECTING': 'tunnel_connecting',
             'ACTIVE': 'active',
+            'STOPPING': 'stopping',
+            'COMPLETED': 'completed',
+            'TERMINATED': 'terminated',
         }
         
         session.status = status_map.get(status_value, session.status)
@@ -465,10 +470,10 @@ class HostSessionHeartbeatView(APIView):
                 'message': 'Not your session'
             }, status=status.HTTP_403_FORBIDDEN)
         
-        if session.status != 'active':
+        if session.status not in ['active', 'starting', 'container_running', 'tunnel_connecting']:
             return Response({
                 'status': 'error',
-                'message': 'Session is not active'
+                'message': f'Session is not active (current status: {session.status})'
             }, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = SessionHeartbeatSerializer(data=request.data)
@@ -502,6 +507,7 @@ class HostSessionCommandsView(APIView):
             200: inline_serializer(
                 name='HostCommandsResponse',
                 fields={
+                    'command': serializers.CharField(allow_null=True),
                     'commands': serializers.ListField(
                         child=inline_serializer(
                             name='HostCommandItem',
@@ -515,7 +521,7 @@ class HostSessionCommandsView(APIView):
             )
         }
     )
-    def get(self, request):
+    def get(self, request, session_id=None):
         host = request.user.host_profile
         
         # Check for sessions that need to be stopped
@@ -523,12 +529,19 @@ class HostSessionCommandsView(APIView):
             host=host,
             status='stopping'
         )
+        if session_id:
+            stopping_sessions = stopping_sessions.filter(id=session_id)
         
         commands = []
+        command_name = None
         for session in stopping_sessions:
             commands.append({
                 'action': 'stop',
                 'session_id': str(session.id)
             })
+            command_name = 'STOP'
         
-        return Response({'commands': commands})
+        return Response({
+            'command': command_name,
+            'commands': commands
+        })
