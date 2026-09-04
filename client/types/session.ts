@@ -36,10 +36,15 @@ export interface SessionDetail {
   sshUser?: string;
   gpuUtilization?: number;
   totalCost: number | null;
+  sshConnectionString?: string;
+  costSoFar?: number;
+  activeTime?: string | null;
+  durationHours?: number;
   createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface Session extends SessionDetail {}
+export type Session = SessionDetail;
 
 /**
  * Normalizes raw session response data from the backend into canonical SessionDetail.
@@ -64,7 +69,7 @@ export function normalizeSession(
   }
 
   const rawGpu = (typeof raw.gpu === "object" && raw.gpu !== null ? raw.gpu : {}) as Record<string, unknown>;
-  const rawGpuId = String(raw.gpu_id ?? raw.gpuId ?? rawGpu.id ?? "");
+  const rawGpuId = typeof raw.gpu === "string" ? raw.gpu : String(raw.gpu_id ?? raw.gpuId ?? rawGpu.id ?? "");
   const fallbackGpu = gpuDict && rawGpuId ? gpuDict[rawGpuId] : undefined;
 
   const gpuName =
@@ -82,7 +87,7 @@ export function normalizeSession(
     gpuName;
 
   const vram =
-    Number(raw.vram ?? raw.gpu_vram ?? raw.memory ?? rawGpu.vram ?? rawGpu.memory ?? fallbackGpu?.vram) ||
+    Number(raw.vram_gb ?? raw.vram ?? raw.gpu_vram ?? raw.memory ?? rawGpu.vram ?? rawGpu.memory ?? fallbackGpu?.vram) ||
     undefined;
 
   const pricePerHour =
@@ -99,8 +104,11 @@ export function normalizeSession(
   // Normalize Status
   let rawStatus = String(raw.status || "completed").toLowerCase();
   if (rawStatus === "running") rawStatus = "active";
-  if (rawStatus === "provisioning" || rawStatus === "starting") rawStatus = "preparing";
+  if (rawStatus === "provisioning" || rawStatus === "starting" || rawStatus === "container_running" || rawStatus === "tunnel_connecting") {
+    rawStatus = "preparing";
+  }
   if (rawStatus === "canceled") rawStatus = "cancelled";
+  if (rawStatus === "terminated") rawStatus = "completed";
 
   const status = (
     ["pending", "preparing", "active", "stopping", "completed", "stopped", "failed", "cancelled"].includes(rawStatus)
@@ -119,13 +127,16 @@ export function normalizeSession(
     connectionStatus = "ready";
   } else if (status === "pending" || status === "preparing") {
     connectionStatus = "provisioning";
+  } else if (status === "completed" || status === "failed" || status === "stopped") {
+    connectionStatus = "disconnected";
   }
 
   // SSH details
-  const sshHost = (raw.ssh_host ?? raw.sshHost ?? raw.host ?? (rawGpu.sshHost as string)) as string | undefined;
-  const rawSshPort = raw.ssh_port ?? raw.sshPort ?? (rawGpu.sshPort as number);
+  const sshHost = (raw.relay_server_ip ?? raw.ssh_host ?? raw.sshHost ?? (rawGpu.sshHost as string)) as string | undefined;
+  const rawSshPort = raw.relay_server_port ?? raw.ssh_port ?? raw.sshPort ?? (rawGpu.sshPort as number);
   const sshPort = rawSshPort ? Number(rawSshPort) : undefined;
   const sshUser = (raw.ssh_user ?? raw.sshUser ?? raw.ssh_username ?? "renter") as string;
+  const sshConnectionString = (raw.ssh_connection_string ?? raw.sshConnectionString) as string | undefined;
 
   // Utilization
   const rawUtil = raw.gpu_utilization ?? raw.gpuUtilization ?? raw.utilization;
@@ -133,10 +144,17 @@ export function normalizeSession(
 
   const startTime = String(raw.start_time ?? raw.startTime ?? raw.created_at ?? raw.createdAt ?? new Date().toISOString());
   const endTime = raw.end_time || raw.endTime ? String(raw.end_time ?? raw.endTime) : null;
+  const activeTime = raw.active_time ? String(raw.active_time) : null;
+  const durationHours = typeof raw.duration_hours === "number" ? raw.duration_hours : undefined;
+  const costSoFar = typeof raw.cost_so_far === "number" ? raw.cost_so_far : undefined;
 
   // Calculate or parse total cost
   let totalCost: number | null = null;
-  if (raw.total_cost !== undefined && raw.total_cost !== null) {
+  if (raw.actual_cost !== undefined && raw.actual_cost !== null) {
+    totalCost = Number(raw.actual_cost);
+  } else if (raw.total_amount !== undefined && raw.total_amount !== null) {
+    totalCost = Number(raw.total_amount);
+  } else if (raw.total_cost !== undefined && raw.total_cost !== null) {
     totalCost = Number(raw.total_cost);
   } else if (raw.totalCost !== undefined && raw.totalCost !== null) {
     totalCost = Number(raw.totalCost);
@@ -147,10 +165,13 @@ export function normalizeSession(
     totalCost = Number((hours * pricePerHour).toFixed(2));
   }
 
+  const renterId = typeof raw.renter === "string" ? raw.renter : String(raw.renter_id ?? raw.renterId ?? "");
+  const hostId = typeof raw.host === "string" ? raw.host : (raw.host_id || raw.hostId ? String(raw.host_id ?? raw.hostId) : undefined);
+
   return {
     id: String(raw.id ?? ""),
-    renterId: String(raw.renter_id ?? raw.renterId ?? ""),
-    hostId: raw.host_id || raw.hostId ? String(raw.host_id ?? raw.hostId) : undefined,
+    renterId,
+    hostId,
     gpuId: rawGpuId,
     gpuName,
     gpuModel,
@@ -158,13 +179,17 @@ export function normalizeSession(
     pricePerHour,
     startTime,
     endTime,
+    activeTime,
+    durationHours,
     status,
     connectionStatus,
     sshHost,
     sshPort,
     sshUser,
+    sshConnectionString,
     gpuUtilization,
     totalCost,
+    costSoFar,
     createdAt: raw.created_at || raw.createdAt ? String(raw.created_at ?? raw.createdAt) : undefined,
   };
 }

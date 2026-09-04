@@ -21,8 +21,8 @@ export function SessionsPage() {
   // Stop Session Dialog State
   const [stoppingSession, setStoppingSession] = useState<SessionDetail | null>(null);
 
-  const fetchSessionData = useCallback(async (showRefreshingSpinner = false) => {
-    if (showRefreshingSpinner) {
+  const fetchSessionData = useCallback(async (isRefresh = false) => {
+    if (isRefresh) {
       setIsRefreshing(true);
     } else {
       setIsLoading(true);
@@ -42,8 +42,25 @@ export function SessionsPage() {
   }, []);
 
   useEffect(() => {
-    fetchSessionData();
-  }, [fetchSessionData]);
+    let isMounted = true;
+    getSessions()
+      .then((data) => {
+        if (isMounted) {
+          setSessions(data);
+          setIsLoading(false);
+        }
+      })
+      .catch((err: unknown) => {
+        if (isMounted) {
+          console.error("Failed to load sessions:", err);
+          setError("Something went wrong while retrieving your rental sessions.");
+          setIsLoading(false);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleStopClick = (session: SessionDetail) => {
     setStoppingSession(session);

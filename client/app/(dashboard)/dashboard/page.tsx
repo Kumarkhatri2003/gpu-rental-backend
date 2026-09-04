@@ -37,9 +37,6 @@ export default function DashboardPage() {
         const dict: Record<string, GPU> = {};
         gpusData.forEach(g => dict[g.id] = g);
         
-        if (!dict["gpu-1"]) dict["gpu-1"] = { ...gpusData[0], id: "gpu-1", model: "RTX 4090" };
-        if (!dict["gpu-2"]) dict["gpu-2"] = { ...gpusData[0], id: "gpu-2", model: "RTX 3090" };
-        
         setGpusDict(dict);
         setIsLoading(false);
       })
@@ -65,9 +62,6 @@ export default function DashboardPage() {
 
           const dict: Record<string, GPU> = {};
           gpusData.forEach(g => dict[g.id] = g);
-          
-          if (!dict["gpu-1"]) dict["gpu-1"] = { ...gpusData[0], id: "gpu-1", model: "RTX 4090" };
-          if (!dict["gpu-2"]) dict["gpu-2"] = { ...gpusData[0], id: "gpu-2", model: "RTX 3090" };
           
           setGpusDict(dict);
           setIsLoading(false);

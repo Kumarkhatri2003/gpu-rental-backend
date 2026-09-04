@@ -15,7 +15,7 @@ export function Footer() {
                 <Cpu className="h-4 w-4" />
               </div>
               <span className="font-extrabold text-xl tracking-tight text-foreground">
-                tero gpu de malai
+                Labhya Compute
               </span>
             </Link>
             <p className="text-xs sm:text-sm text-muted-foreground max-w-xs leading-relaxed">
@@ -53,7 +53,7 @@ export function Footer() {
         </div>
 
         <div className="pt-8 border-t border-border/60 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-          <p>© {currentYear} tero gpu de malai. All rights reserved.</p>
+          <p>© {currentYear} Labhya Compute. All rights reserved.</p>
           <div className="flex space-x-6">
             <span className="hover:text-foreground transition-colors cursor-not-allowed opacity-60">Terms of Service</span>
             <span className="hover:text-foreground transition-colors cursor-not-allowed opacity-60">Privacy Policy</span>

@@ -13,7 +13,7 @@ export function HostCTA() {
             Have a GPU sitting idle?
           </h2>
           <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
-            Turn unused GPU capacity into recurring revenue by becoming a tero gpu de malai host with our lightweight Windows Desktop Agent.
+            Turn unused GPU capacity into recurring revenue by becoming a Labhya Compute host with our lightweight Windows Desktop Agent.
           </p>
           <div className="pt-2">
             <Link href="/register/host">

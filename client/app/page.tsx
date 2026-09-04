@@ -1,7 +1,6 @@
 import { Navbar } from "@/components/landing/Navbar";
 import { Hero } from "@/components/landing/Hero";
 import { MarketplacePreview } from "@/components/landing/MarketplacePreview";
-import { TrustSection } from "@/components/landing/TrustSection";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { WhyLabhya } from "@/components/landing/WhyLabhya";
 import { TechnicalSecurity } from "@/components/landing/TechnicalSecurity";
@@ -16,7 +15,6 @@ export default function LandingPage() {
       <main className="flex-grow flex flex-col">
         <Hero />
         <MarketplacePreview />
-        <TrustSection />
         <HowItWorks />
         <WhyLabhya />
         <TechnicalSecurity />

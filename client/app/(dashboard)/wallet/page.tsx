@@ -18,8 +18,8 @@ export default function WalletPage() {
   const [error, setError] = useState<string | null>(null);
   const [isDepositDialogOpen, setIsDepositDialogOpen] = useState<boolean>(false);
 
-  const fetchWalletData = useCallback(async (isSilentRefresh = false) => {
-    if (isSilentRefresh) {
+  const fetchWalletData = useCallback(async (isRefresh = false) => {
+    if (isRefresh) {
       setIsRefreshing(true);
     } else {
       setIsLoading(true);
@@ -43,8 +43,29 @@ export default function WalletPage() {
   }, []);
 
   useEffect(() => {
-    fetchWalletData();
-  }, [fetchWalletData]);
+    let isMounted = true;
+    Promise.all([
+      getWalletBalance(),
+      getWalletTransactions(),
+    ])
+      .then(([walletData, txData]) => {
+        if (isMounted) {
+          setWallet(walletData);
+          setTransactions(txData);
+          setIsLoading(false);
+        }
+      })
+      .catch((err: unknown) => {
+        if (isMounted) {
+          console.error("Failed to load wallet data:", err);
+          setError("We couldn't retrieve your wallet information. Please try again.");
+          setIsLoading(false);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleDepositSuccess = (updatedWallet: Wallet) => {
     setWallet(updatedWallet);

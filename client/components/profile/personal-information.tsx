@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Info, Save, User } from "lucide-react";
 import { UserProfile } from "@/types/user";
 import { updateProfile } from "@/services/profile";
@@ -24,10 +24,12 @@ export function PersonalInformation({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ firstName?: string; lastName?: string }>({});
 
-  useEffect(() => {
+  const [prevProfile, setPrevProfile] = useState(profile);
+  if (profile !== prevProfile) {
+    setPrevProfile(profile);
     setFirstName(profile.firstName || "");
     setLastName(profile.lastName || "");
-  }, [profile]);
+  }
 
   const hasChanges =
     firstName.trim() !== (profile.firstName || "").trim() ||

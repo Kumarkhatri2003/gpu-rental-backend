@@ -1,6 +1,5 @@
 import React from "react";
 import { History } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 
 interface WalletEmptyStateProps {
   filter?: string;

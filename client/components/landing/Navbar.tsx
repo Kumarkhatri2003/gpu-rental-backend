@@ -27,7 +27,7 @@ export function Navbar() {
               <Cpu className="h-4 w-4" />
             </div>
             <span className="font-extrabold text-xl tracking-tight text-foreground">
-              tero gpu de malai
+              Labhya Compute
             </span>
           </Link>
           <nav className="hidden md:flex gap-8">
