@@ -1,5 +1,5 @@
 import { Search, CreditCard, Terminal, Zap } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 
 export function HowItWorks() {
   const steps = [
@@ -37,7 +37,7 @@ export function HowItWorks() {
             Seamless Workflow
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-3">
-            How tero gpu de malai Works
+            How Labhya Compute Works
           </h2>
           <p className="text-base text-muted-foreground leading-relaxed">
             Get from zero to running AI workloads in minutes through automated container provisioning.

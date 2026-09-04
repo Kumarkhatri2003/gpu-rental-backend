@@ -7,18 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Eye, EyeOff, Check, ArrowRight, ArrowLeft, Cpu } from "lucide-react";
+import { Eye, EyeOff, Check, ArrowRight, ArrowLeft, Cpu, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { AxiosError } from "axios";
 
-// Mock API submission
-const mockRegisterUser = async (): Promise<{ success: boolean }> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({ success: true });
-    }, 1200);
-  });
-};
+import { registerUser, RegisterPayload } from "@/services/api";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -37,8 +31,10 @@ export default function RegisterPage() {
     termsAccepted: false,
   });
 
-  // Error State for current step
+  // Error State for fields
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // General server/submission error
+  const [serverError, setServerError] = useState("");
 
   // Password visibility
   const [showPassword, setShowPassword] = useState(false);
@@ -56,14 +52,28 @@ export default function RegisterPage() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+    }
+    if (serverError) {
+      setServerError("");
     }
   };
 
   const handleCheckboxChange = (checked: boolean) => {
     setFormData((prev) => ({ ...prev, termsAccepted: checked }));
     if (errors.termsAccepted) {
-      setErrors((prev) => ({ ...prev, termsAccepted: "" }));
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.termsAccepted;
+        return next;
+      });
+    }
+    if (serverError) {
+      setServerError("");
     }
   };
 
@@ -81,6 +91,9 @@ export default function RegisterPage() {
       } else if (fName.length < 2) {
         newErrors.firstName = "First name must be at least 2 characters";
         isValid = false;
+      } else if (fName.length > 100) {
+        newErrors.firstName = "First name must be 100 characters or fewer";
+        isValid = false;
       }
 
       if (!lName) {
@@ -88,6 +101,9 @@ export default function RegisterPage() {
         isValid = false;
       } else if (lName.length < 2) {
         newErrors.lastName = "Last name must be at least 2 characters";
+        isValid = false;
+      } else if (lName.length > 100) {
+        newErrors.lastName = "Last name must be 100 characters or fewer";
         isValid = false;
       }
 
@@ -103,6 +119,9 @@ export default function RegisterPage() {
         isValid = false;
       } else if (!emailRegex.test(email)) {
         newErrors.email = "Please enter a valid email address";
+        isValid = false;
+      } else if (email.length > 255) {
+        newErrors.email = "Email must be 255 characters or fewer";
         isValid = false;
       }
 
@@ -132,7 +151,7 @@ export default function RegisterPage() {
       }
     }
 
-    setErrors(newErrors);
+    setErrors((prev) => ({ ...prev, ...newErrors }));
     return isValid;
   };
 
@@ -144,7 +163,7 @@ export default function RegisterPage() {
 
   const handleBack = () => {
     setStep((prev) => prev - 1);
-    setErrors({});
+    setServerError("");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent, isFinalStep = false) => {
@@ -161,20 +180,123 @@ export default function RegisterPage() {
   const handleSubmit = async () => {
     if (!validateStep(4)) return;
 
-    setIsLoading(true);
-    try {
-      const res = await mockRegisterUser();
+    // Validate that earlier required fields are present
+    const fName = formData.firstName.trim();
+    const lName = formData.lastName.trim();
+    if (!fName || !lName) {
+      setStep(1);
+      validateStep(1);
+      return;
+    }
 
-      if (res.success) {
+    const cleanEmail = formData.email.trim().toLowerCase();
+    if (!cleanEmail) {
+      setStep(2);
+      validateStep(2);
+      return;
+    }
+
+    if (!formData.password) {
+      setStep(3);
+      validateStep(3);
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setStep(3);
+      setErrors((prev) => ({ ...prev, confirmPassword: "Passwords do not match" }));
+      toast.error("Passwords do not match. Please verify your password.");
+      return;
+    }
+
+    setIsLoading(true);
+    setServerError("");
+
+    try {
+      const payload: RegisterPayload = {
+        email: cleanEmail,
+        first_name: fName,
+        last_name: lName,
+        role: "renter",
+        password: formData.password,
+        password2: formData.confirmPassword,
+      };
+
+      const res = await registerUser(payload);
+
+      if (res.status === "success" || res.data?.user) {
         setFormData((prev) => ({ ...prev, password: "", confirmPassword: "" }));
+        setErrors({});
+        setServerError("");
         setStep(5);
+        toast.success(res.message || "Account created successfully! Please log in.");
       }
-    } catch {
-      toast.error("An error occurred during registration. Please try again.");
+    } catch (err: unknown) {
+      const axiosErr = err as AxiosError<Record<string, unknown>>;
+      const data = axiosErr.response?.data;
+      const fieldErrors: Record<string, string> = {};
+      let primaryMessage = "";
+
+      if (data && typeof data === "object") {
+        if (data.email) {
+          const msg = Array.isArray(data.email) ? data.email.join(" ") : String(data.email);
+          fieldErrors.email = msg;
+          if (!primaryMessage) primaryMessage = msg;
+        }
+        if (data.password) {
+          const msg = Array.isArray(data.password) ? data.password.join(" ") : String(data.password);
+          fieldErrors.password = msg;
+          if (!primaryMessage) primaryMessage = msg;
+        }
+        if (data.password2) {
+          const msg = Array.isArray(data.password2) ? data.password2.join(" ") : String(data.password2);
+          fieldErrors.confirmPassword = msg;
+          if (!primaryMessage) primaryMessage = msg;
+        }
+        if (data.first_name) {
+          const msg = Array.isArray(data.first_name) ? data.first_name.join(" ") : String(data.first_name);
+          fieldErrors.firstName = msg;
+          if (!primaryMessage) primaryMessage = msg;
+        }
+        if (data.last_name) {
+          const msg = Array.isArray(data.last_name) ? data.last_name.join(" ") : String(data.last_name);
+          fieldErrors.lastName = msg;
+          if (!primaryMessage) primaryMessage = msg;
+        }
+        if (data.role) {
+          const msg = Array.isArray(data.role) ? data.role.join(" ") : String(data.role);
+          if (!primaryMessage) primaryMessage = msg;
+        }
+        if (data.non_field_errors) {
+          const msg = Array.isArray(data.non_field_errors) ? data.non_field_errors.join(" ") : String(data.non_field_errors);
+          if (!primaryMessage) primaryMessage = msg;
+        }
+        if (typeof data.detail === "string" && !primaryMessage) {
+          primaryMessage = data.detail;
+        }
+        if (typeof data.message === "string" && !primaryMessage) {
+          primaryMessage = data.message;
+        }
+      }
+
+      if (!axiosErr.response) {
+        primaryMessage = "Unable to connect to the compute service. Please check your network and try again.";
+      } else if (!primaryMessage) {
+        if (axiosErr.response.status >= 500) {
+          primaryMessage = "Server error while creating your account. Please try again in a moment.";
+        } else {
+          primaryMessage = "Registration failed. Please check the provided details and try again.";
+        }
+      }
+
+      setErrors(fieldErrors);
+      setServerError(primaryMessage);
+      toast.error(primaryMessage);
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const steps = [
     { num: 1, label: "About You" },
@@ -422,23 +544,77 @@ export default function RegisterPage() {
           {/* Step 4: Review & Terms */}
           {step === 4 && (
             <div className="flex flex-col gap-4 animate-in fade-in duration-200">
-              <div className="bg-secondary/40 p-4 rounded-xl space-y-2.5 border border-border/60">
-                <div>
-                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
-                    Name
-                  </div>
-                  <div className="font-bold text-sm text-foreground">
-                    {formData.firstName} {formData.lastName}
+              {serverError && (
+                <div className="p-3 text-xs rounded-xl bg-destructive/10 text-destructive border border-destructive/20 flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-destructive" />
+                  <div className="flex-1 space-y-1">
+                    <p className="font-semibold leading-snug">{serverError}</p>
+                    {errors.email && (
+                      <div className="flex items-center gap-2 pt-0.5">
+                        <button
+                          type="button"
+                          onClick={() => setStep(2)}
+                          className="text-xs text-primary underline font-medium hover:opacity-80 cursor-pointer"
+                        >
+                          Edit email address
+                        </button>
+                        <span className="text-muted-foreground">•</span>
+                        <Link
+                          href={`/login?email=${encodeURIComponent(formData.email)}`}
+                          className="text-xs text-primary underline font-medium hover:opacity-80"
+                        >
+                          Log in instead
+                        </Link>
+                      </div>
+                    )}
+                    {errors.password && (
+                      <button
+                        type="button"
+                        onClick={() => setStep(3)}
+                        className="text-xs text-primary underline font-medium hover:opacity-80 cursor-pointer pt-0.5 block"
+                      >
+                        Change password
+                      </button>
+                    )}
                   </div>
                 </div>
+              )}
+
+              <div className="bg-secondary/40 p-4 rounded-xl space-y-2.5 border border-border/60">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
+                      Name
+                    </div>
+                    <div className="font-bold text-sm text-foreground">
+                      {formData.firstName} {formData.lastName}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setStep(1)}
+                    className="text-xs text-primary hover:underline font-medium cursor-pointer"
+                  >
+                    Edit
+                  </button>
+                </div>
                 <div className="h-px bg-border/40" />
-                <div>
-                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
-                    Email
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
+                      Email
+                    </div>
+                    <div className="font-bold text-sm text-foreground font-mono">
+                      {formData.email}
+                    </div>
                   </div>
-                  <div className="font-bold text-sm text-foreground font-mono">
-                    {formData.email}
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setStep(2)}
+                    className="text-xs text-primary hover:underline font-medium cursor-pointer"
+                  >
+                    Edit
+                  </button>
                 </div>
               </div>
 
@@ -487,6 +663,7 @@ export default function RegisterPage() {
                   variant="primary"
                   size="md"
                   isPending={isLoading}
+                  isDisabled={isLoading}
                   onPress={handleSubmit}
                   className="flex-1 h-11 rounded-xl font-semibold shadow-sm"
                 >
@@ -507,7 +684,7 @@ export default function RegisterPage() {
                   Account Created
                 </h2>
                 <p className="text-xs text-muted-foreground leading-relaxed max-w-xs">
-                  Welcome to tero gpu de malai, {formData.firstName}. Your account has been set up successfully.
+                  Welcome to tero gpu de malai, {formData.firstName}. Your account has been registered successfully. Please proceed to login with your credentials.
                 </p>
               </div>
 
@@ -515,10 +692,10 @@ export default function RegisterPage() {
                 variant="primary"
                 size="md"
                 fullWidth
-                onPress={() => router.push("/dashboard")}
+                onPress={() => router.push(formData.email ? `/login?email=${encodeURIComponent(formData.email)}` : "/login")}
                 className="h-11 rounded-xl font-semibold shadow-sm mt-2"
               >
-                Continue to Dashboard
+                Proceed to Log In
               </Button>
             </div>
           )}

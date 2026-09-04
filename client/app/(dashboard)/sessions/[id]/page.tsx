@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, use } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Check,
@@ -31,7 +30,6 @@ interface SessionDetailPageProps {
 
 export default function SessionDetailPage({ params }: SessionDetailPageProps) {
   const { id } = use(params);
-  const router = useRouter();
 
   const [session, setSession] = useState<SessionDetail | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -40,7 +38,6 @@ export default function SessionDetailPage({ params }: SessionDetailPageProps) {
 
   useEffect(() => {
     let isMounted = true;
-    setIsLoading(true);
 
     getSessionById(id)
       .then((data) => {
@@ -60,6 +57,31 @@ export default function SessionDetailPage({ params }: SessionDetailPageProps) {
       isMounted = false;
     };
   }, [id]);
+
+  const isPendingOrPreparing = session?.status === "pending" || session?.status === "preparing";
+
+  // Poll for status updates when instance is provisioning or pending
+  useEffect(() => {
+    if (!isPendingOrPreparing) {
+      return;
+    }
+
+    let isPolling = true;
+    const interval = setInterval(() => {
+      getSessionById(id)
+        .then((updated) => {
+          if (isPolling && updated) {
+            setSession(updated);
+          }
+        })
+        .catch((err) => console.warn("Session status polling error:", err));
+    }, 5000);
+
+    return () => {
+      isPolling = false;
+      clearInterval(interval);
+    };
+  }, [id, isPendingOrPreparing]);
 
   const handleCopyCommand = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -110,7 +132,9 @@ export default function SessionDetailPage({ params }: SessionDetailPageProps) {
 
   const isActive = session.status === "active";
   const isPending = session.status === "pending" || session.status === "preparing";
-  const sshCommand = session.sshHost && session.sshPort
+  const sshCommand = session.sshConnectionString
+    ? session.sshConnectionString
+    : session.sshHost && session.sshPort
     ? `ssh -p ${session.sshPort} ${session.sshUser || "renter"}@${session.sshHost}`
     : `ssh user@relay.labhya.io -p 22045`;
 

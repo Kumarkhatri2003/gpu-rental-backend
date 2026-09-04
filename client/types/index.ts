@@ -1,3 +1,5 @@
+import { MarketplaceGPU } from "./gpu";
+
 export interface User {
   id: string;
   email: string;
@@ -7,21 +9,7 @@ export interface User {
   updatedAt: string;
 }
 
-export interface GPU {
-  id: string;
-  hostId: string;
-  model: string;
-  vram: number;
-  pricePerHour: number;
-  status: "available" | "rented" | "offline";
-  specs?: {
-    cudaCores?: number;
-    memoryType?: string;
-    pcieGen?: string;
-  };
-  location?: string;
-  createdAt?: string;
-}
+export type GPU = MarketplaceGPU;
 
 export * from "./gpu";
 export * from "./session";

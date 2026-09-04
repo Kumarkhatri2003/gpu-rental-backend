@@ -9,7 +9,7 @@ export function WhyLabhya() {
       icon: <Banknote className="w-5 h-5 text-primary" />
     },
     {
-      title: "Instant On-Demand Access",
+      title: "On-Demand GPU Access",
       description: "Rent compute when you need it instead of maintaining idle local clusters or expensive long-term cloud commitments.",
       icon: <Clock className="w-5 h-5 text-primary" />
     },
@@ -19,8 +19,8 @@ export function WhyLabhya() {
       icon: <Box className="w-5 h-5 text-primary" />
     },
     {
-      title: "Encrypted SSH Relays",
-      description: "Secure peer-to-peer relay architecture routes encrypted SSH traffic without requiring public IP addresses on hosts.",
+      title: "Secure SSH Access",
+      description: "Direct reverse SSH gateway connects you safely to your provisioned compute container with per-session credentials.",
       icon: <Lock className="w-5 h-5 text-primary" />
     }
   ];
@@ -30,7 +30,7 @@ export function WhyLabhya() {
       <div className="container mx-auto px-6 lg:px-10">
         <div className="text-center mb-16 max-w-2xl mx-auto">
           <div className="text-xs font-bold uppercase tracking-wider text-primary mb-2">
-            Why tero gpu de malai
+            Why Labhya Compute
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground mb-3">
             Engineered for Modern AI Engineering

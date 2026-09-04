@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@heroui/react": ["./components/ui/heroui"],
+      "@heroui/button": ["./components/ui/button"]
     }
   },
   "include": [

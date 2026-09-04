@@ -23,13 +23,13 @@ export function Hero() {
           </h1>
           
           <p className="text-base sm:text-lg text-muted-foreground mb-8 leading-relaxed font-normal max-w-xl">
-            tero gpu de malai lets developers, researchers, and AI builders rent available compute capacity with zero hardware overhead and instant SSH access.
+            Labhya Compute lets developers, researchers, and AI builders rent available compute capacity with zero hardware overhead and secure SSH access.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <Link href="/marketplace" className="w-full sm:w-auto">
               <Button className="w-full sm:w-auto h-12 px-8 text-base font-semibold shadow-sm gap-2">
-                <span>Browse GPUs</span>
+                <span>Explore GPUs</span>
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
@@ -60,12 +60,12 @@ export function Hero() {
                 <div className="w-3 h-3 rounded-full bg-amber-500/80" />
                 <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
               </div>
-              <div className="ml-4 text-xs text-muted-foreground font-mono font-medium">ssh renter@labhya-relay</div>
+              <div className="ml-4 text-xs text-muted-foreground font-mono font-medium">ssh renter@relay.labhyacompute.com</div>
             </div>
             <div className="p-6 font-mono text-xs text-foreground/90 flex flex-col items-start min-h-[240px] leading-relaxed bg-slate-950 text-slate-100">
               <div className="flex items-center gap-2 mb-4 w-full">
                 <Terminal className="w-4 h-4 text-primary" />
-                <span className="text-primary-foreground font-semibold">Establishing encrypted SSH session...</span>
+                <span className="text-primary-foreground font-semibold">Establishing secure SSH session...</span>
               </div>
               <p className="text-slate-300">Welcome to Ubuntu 22.04 LTS (Docker isolated environment)</p>
               <div className="mt-4 space-y-1 w-full">

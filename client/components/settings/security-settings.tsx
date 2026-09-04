@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Shield, LogOut, AlertTriangle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/stores/auth-store";
+import { logoutUser } from "@/services/api";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -62,15 +62,14 @@ function ConfirmDialog({
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function SecuritySettings() {
-  const logout = useAuthStore((s) => s.logout);
   const router = useRouter();
 
   const [logoutAllLoading, setLogoutAllLoading] = useState(false);
   const [showLogoutAllConfirm, setShowLogoutAllConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logoutUser();
     toast.success("You have been signed out.");
     router.replace("/login");
   };
@@ -78,10 +77,8 @@ export function SecuritySettings() {
   const handleLogoutAll = async () => {
     setShowLogoutAllConfirm(false);
     setLogoutAllLoading(true);
-    // Simulate network call — no backend endpoint defined yet
-    await new Promise((r) => setTimeout(r, 900));
+    await logoutUser();
     setLogoutAllLoading(false);
-    logout();
     toast.success("All sessions terminated. Please sign in again.");
     router.replace("/login");
   };

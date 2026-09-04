@@ -4,11 +4,12 @@ import { LogOut, Sun, Moon, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useAppStore } from "@/stores/app-store";
 import { useAuthStore } from "@/stores/auth-store";
+import { logoutUser } from "@/services/api";
 import { Button } from "@/components/ui/button";
 
 export function Header() {
   const { isSidebarOpen, toggleSidebar } = useAppStore();
-  const { logout, user } = useAuthStore();
+  const { user } = useAuthStore();
   const { setTheme, theme } = useTheme();
 
   return (
@@ -57,7 +58,7 @@ export function Header() {
           variant="ghost"
           size="sm"
           isIconOnly
-          onPress={logout}
+          onPress={logoutUser}
           aria-label="Sign out"
           className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
         >

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Cpu } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/services/api";
 
 function LoginForm() {
   const { setAuth } = useAuthStore();
@@ -16,7 +17,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect") || "/dashboard";
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(searchParams.get("email") || "");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -49,43 +50,54 @@ function LoginForm() {
 
     setIsLoading(true);
     try {
-      // Simulate auth request latency
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const response = await api.post("/auth/login/", {
+        email: email.trim().toLowerCase(),
+        password,
+      });
 
-      const normalizedEmail = email.trim().toLowerCase();
-      const username = normalizedEmail.split("@")[0] || "Renter";
+      const resData = response.data?.data ?? response.data;
+      const accessToken = resData.access_token ?? resData.token;
+      const refreshToken = resData.refresh_token;
+      const userRaw = resData.user ?? resData;
 
-      setAuth(
-        {
-          id: `user-${Date.now()}`,
-          email: normalizedEmail,
-          name: username.charAt(0).toUpperCase() + username.slice(1),
-          role: "renter",
-        },
-        `jwt-token-${Date.now()}`
-      );
+      const user = {
+        id: String(userRaw.id || ""),
+        email: String(userRaw.email || email.trim()),
+        name: userRaw.name || `${userRaw.first_name || ""} ${userRaw.last_name || ""}`.trim() || "Renter",
+        firstName: userRaw.first_name,
+        lastName: userRaw.last_name,
+        role: (userRaw.role === "host" ? "host" : "renter") as "renter" | "host",
+      };
+
+      setAuth(user, accessToken, refreshToken);
 
       toast.success("Signed in successfully.");
       router.push(redirectUrl);
-    } catch {
-      toast.error("Failed to sign in. Please check your credentials.");
+    } catch (err: unknown) {
+      const axiosErr = err as {
+        response?: {
+          data?: Record<string, string | string[]>;
+        };
+      };
+      const data = axiosErr.response?.data;
+      let errorMsg = "Failed to sign in. Please check your credentials.";
+      if (data) {
+        if (typeof data.message === "string") {
+          errorMsg = data.message;
+        } else if (typeof data.detail === "string") {
+          errorMsg = data.detail;
+        } else if (data.non_field_errors) {
+          errorMsg = Array.isArray(data.non_field_errors) ? data.non_field_errors[0] : String(data.non_field_errors);
+        } else if (data.email) {
+          errorMsg = Array.isArray(data.email) ? data.email[0] : String(data.email);
+        } else if (data.password) {
+          errorMsg = Array.isArray(data.password) ? data.password[0] : String(data.password);
+        }
+      }
+      toast.error(errorMsg);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleDevBypass = () => {
-    setAuth(
-      {
-        id: "dev-user-1",
-        email: "dev@labhya.com",
-        name: "Developer",
-        role: "renter",
-      },
-      "fake-jwt-token-12345"
-    );
-    toast.success("Developer bypass active.");
-    router.push(redirectUrl);
   };
 
   return (
@@ -172,18 +184,6 @@ function LoginForm() {
               className="h-11 rounded-xl text-sm font-semibold shadow-sm"
             >
               <span>{isLoading ? "Signing in..." : "Login"}</span>
-            </Button>
-
-            {/* Quick Developer Bypass */}
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              fullWidth
-              onPress={handleDevBypass}
-              className="rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground"
-            >
-              Quick Login as Developer
             </Button>
           </div>
         </form>

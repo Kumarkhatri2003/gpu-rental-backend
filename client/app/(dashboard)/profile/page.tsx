@@ -32,8 +32,25 @@ export default function ProfilePage() {
   }, []);
 
   useEffect(() => {
-    fetchProfileData();
-  }, [fetchProfileData]);
+    let isMounted = true;
+    getProfile()
+      .then((data) => {
+        if (isMounted) {
+          setProfile(data);
+          setIsLoading(false);
+        }
+      })
+      .catch((err: unknown) => {
+        if (isMounted) {
+          console.error("Failed to load profile:", err);
+          setError("We couldn't retrieve your account details. Please try again.");
+          setIsLoading(false);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleProfileUpdated = (updated: UserProfile) => {
     setProfile(updated);

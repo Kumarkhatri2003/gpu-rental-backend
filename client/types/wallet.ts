@@ -5,6 +5,8 @@ export interface Wallet {
   id?: string;
   userId?: string;
   balance: number;
+  availableBalance?: number;
+  holdAmount?: number;
   currency: string;
   updatedAt?: string;
   createdAt?: string;
@@ -40,17 +42,21 @@ export function normalizeWallet(raw: Record<string, unknown> | null | undefined)
   if (!raw || typeof raw !== "object") {
     return {
       balance: 0,
+      availableBalance: 0,
+      holdAmount: 0,
       currency: "NPR",
     };
   }
 
-  // Handle nested wallet object if returned like { data: { wallet: ... } } or { wallet: ... }
-  const data = (raw.wallet || raw.data || raw) as Record<string, unknown>;
+  // Handle nested wallet object if returned like { data: { ... } } or { wallet: ... }
+  const data = (raw.data || raw.wallet || raw) as Record<string, unknown>;
 
   const rawBalance = data.balance ?? raw.balance ?? 0;
+  const rawAvailable = data.available_balance ?? raw.available_balance ?? rawBalance;
+  const rawHold = data.hold_amount ?? raw.hold_amount ?? 0;
   const rawCurrency = (data.currency || raw.currency || "NPR") as string;
   const rawId = (data.id ?? data.wallet_id ?? raw.id) as string | undefined;
-  const rawUserId = (data.user_id ?? data.userId ?? raw.user_id) as string | undefined;
+  const rawUserId = (data.user_id ?? data.userId ?? raw.user_id ?? raw.user) as string | undefined;
   const rawUpdatedAt = (data.updated_at ?? data.updatedAt ?? raw.updated_at) as string | undefined;
   const rawCreatedAt = (data.created_at ?? data.createdAt ?? raw.created_at) as string | undefined;
 
@@ -58,6 +64,8 @@ export function normalizeWallet(raw: Record<string, unknown> | null | undefined)
     id: rawId ? String(rawId) : undefined,
     userId: rawUserId ? String(rawUserId) : undefined,
     balance: Number(rawBalance) || 0,
+    availableBalance: Number(rawAvailable) || 0,
+    holdAmount: Number(rawHold) || 0,
     currency: String(rawCurrency).toUpperCase(),
     updatedAt: rawUpdatedAt ? String(rawUpdatedAt) : undefined,
     createdAt: rawCreatedAt ? String(rawCreatedAt) : undefined,
@@ -105,6 +113,12 @@ export function normalizeTransaction(raw: Record<string, unknown> | null | undef
 }
 
 export function normalizeTransactions(rawList: unknown): WalletTransaction[] {
+  if (rawList && typeof rawList === "object" && "results" in rawList && Array.isArray((rawList as { results: unknown[] }).results)) {
+    return (rawList as { results: unknown[] }).results.map((item) => normalizeTransaction(item as Record<string, unknown>));
+  }
+  if (rawList && typeof rawList === "object" && "data" in rawList && Array.isArray((rawList as { data: unknown[] }).data)) {
+    return (rawList as { data: unknown[] }).data.map((item) => normalizeTransaction(item as Record<string, unknown>));
+  }
   if (!Array.isArray(rawList)) return [];
   return rawList.map((item) => normalizeTransaction(item as Record<string, unknown>));
 }

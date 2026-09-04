@@ -7,8 +7,10 @@ import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 import { DashboardLayout } from "@/components/layouts/DashboardLayout";
 import { getGpuById } from "@/services/api";
+import { createSession } from "@/services/sessions";
 import { MarketplaceGPU } from "@/types/gpu";
 import { useAuthStore } from "@/stores/auth-store";
+import { toast } from "sonner";
 import {
   Cpu,
   MapPin,
@@ -41,6 +43,9 @@ export default function GpuDetailsPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isRentModalOpen, setIsRentModalOpen] = useState<boolean>(false);
+  const [durationHours, setDurationHours] = useState<number>(1);
+  const [isRenting, setIsRenting] = useState<boolean>(false);
+  const [rentalError, setRentalError] = useState<string | null>(null);
 
   const fetchDetails = useCallback(() => {
     if (!id) return;
@@ -99,7 +104,62 @@ export default function GpuDetailsPage() {
     }
 
     // Authenticated user can proceed to rental confirmation
+    setRentalError(null);
     setIsRentModalOpen(true);
+  };
+
+  const handleConfirmRental = async () => {
+    if (!gpu) return;
+    setIsRenting(true);
+    setRentalError(null);
+
+    try {
+      const session = await createSession({
+        gpu_id: String(gpu.id),
+        duration_hours: durationHours,
+        work_protection: false,
+      });
+
+      toast.success("GPU rental session created successfully!");
+      setIsRentModalOpen(false);
+
+      if (session?.id) {
+        router.push(`/sessions/${session.id}`);
+      } else {
+        router.push("/sessions");
+      }
+    } catch (err: unknown) {
+      const axiosErr = err as {
+        response?: {
+          status?: number;
+          data?: { message?: string; detail?: string; error?: string };
+        };
+      };
+      const resData = axiosErr.response?.data;
+      const status = axiosErr.response?.status;
+      let msg = "Failed to create rental session. Please try again.";
+
+      if (resData) {
+        if (typeof resData.message === "string") msg = resData.message;
+        else if (typeof resData.detail === "string") msg = resData.detail;
+        else if (typeof resData.error === "string") msg = resData.error;
+      }
+
+      setRentalError(msg);
+
+      if (status === 400 && msg.toLowerCase().includes("balance")) {
+        toast.error("Insufficient wallet balance for this rental.", {
+          action: {
+            label: "Go to Wallet",
+            onClick: () => router.push("/wallet"),
+          },
+        });
+      } else {
+        toast.error(msg);
+      }
+    } finally {
+      setIsRenting(false);
+    }
   };
 
   const isAvailable = gpu?.availability === "available";
@@ -277,29 +337,67 @@ export default function GpuDetailsPage() {
                 <span>Location:</span>
                 <span className="font-semibold text-foreground">{gpu.location}</span>
               </div>
+              <div className="flex justify-between items-center text-muted-foreground">
+                <span>Duration:</span>
+                <select
+                  value={durationHours}
+                  onChange={(e) => setDurationHours(Number(e.target.value))}
+                  disabled={isRenting}
+                  className="bg-muted/50 border border-border rounded-lg px-2.5 py-1 text-sm font-semibold text-foreground cursor-pointer"
+                >
+                  {[1, 2, 3, 4, 6, 8, 12, 24].map((h) => (
+                    <option key={h} value={h}>
+                      {h} {h === 1 ? "hour" : "hours"}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="flex justify-between text-muted-foreground pt-2 border-t border-border/60">
-                <span>Rental Rate:</span>
+                <span>Hourly Rate:</span>
                 <span className="font-bold text-foreground font-mono">NPR {gpu.pricePerHour} / hr</span>
               </div>
+              <div className="flex justify-between text-muted-foreground">
+                <span>Total Estimated Cost:</span>
+                <span className="font-bold text-primary font-mono text-base">
+                  NPR {(gpu.pricePerHour * durationHours).toFixed(2)}
+                </span>
+              </div>
+
+              {rentalError && (
+                <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs space-y-2">
+                  <p>{rentalError}</p>
+                  {rentalError.toLowerCase().includes("balance") && (
+                    <Link
+                      href="/wallet"
+                      className="inline-block text-xs font-semibold underline hover:text-destructive/80"
+                    >
+                      Deposit Funds in Wallet &rarr;
+                    </Link>
+                  )}
+                </div>
+              )}
             </Card.Content>
 
             <Card.Footer className="p-0 pt-2 flex gap-3">
               <Button
                 variant="tertiary"
-                onPress={() => setIsRentModalOpen(false)}
+                onPress={() => {
+                  setIsRentModalOpen(false);
+                  setRentalError(null);
+                }}
+                isDisabled={isRenting}
                 className="flex-1 font-semibold"
               >
                 Cancel
               </Button>
               <Button
                 variant="primary"
-                onPress={() => {
-                  setIsRentModalOpen(false);
-                  router.push("/dashboard");
-                }}
+                onPress={handleConfirmRental}
+                isPending={isRenting}
+                isDisabled={isRenting}
                 className="flex-1 font-semibold"
               >
-                Go to Dashboard
+                Confirm Rental
               </Button>
             </Card.Footer>
           </Card>

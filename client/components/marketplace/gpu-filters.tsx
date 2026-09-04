@@ -3,7 +3,6 @@
 import React from "react";
 import { Filter, RotateCcw, Check } from "lucide-react";
 import { GpuFilters } from "@/types/gpu";
-import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 export interface ModelCount {
