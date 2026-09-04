@@ -1,0 +1,5718 @@
+openapi: 3.0.3
+info:
+  title: SSH-Based GPU Resource Provisioning API
+  version: 1.0.0
+  description: API documentation for the GPU Renting and SSH Provisioning Platform.
+paths:
+  /api/admin/dashboard/:
+    get:
+      operationId: admin_dashboard_retrieve
+      description: Admin dashboard overview with comprehensive platform metrics
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/admin/gpus/:
+    get:
+      operationId: admin_gpus_list
+      description: List all GPUs
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAdminGPUList'
+          description: ''
+  /api/admin/gpus/{id}/:
+    get:
+      operationId: admin_gpus_retrieve
+      description: Get, update, delete GPU
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminGPU'
+          description: ''
+    put:
+      operationId: admin_gpus_update
+      description: Get, update, delete GPU
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminGPU'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AdminGPU'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AdminGPU'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminGPU'
+          description: ''
+    patch:
+      operationId: admin_gpus_partial_update
+      description: Get, update, delete GPU
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminGPU'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminGPU'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminGPU'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminGPU'
+          description: ''
+    delete:
+      operationId: admin_gpus_destroy
+      description: Get, update, delete GPU
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/admin/hosts/:
+    get:
+      operationId: admin_hosts_list
+      description: List all hosts
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAdminHostList'
+          description: ''
+  /api/admin/hosts/{id}/:
+    get:
+      operationId: admin_hosts_retrieve
+      description: Get and update host profile status or penalty
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminHost'
+          description: ''
+    put:
+      operationId: admin_hosts_update
+      description: Get and update host profile status or penalty
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminHost'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AdminHost'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AdminHost'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminHost'
+          description: ''
+    patch:
+      operationId: admin_hosts_partial_update
+      description: Get and update host profile status or penalty
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminHost'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminHost'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminHost'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminHost'
+          description: ''
+  /api/admin/logs/:
+    get:
+      operationId: admin_logs_list
+      description: List system logs
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSystemLogList'
+          description: ''
+  /api/admin/logs/clear/:
+    delete:
+      operationId: admin_logs_clear_destroy
+      description: Clear system logs
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/admin/reviews/:
+    get:
+      operationId: admin_reviews_list
+      description: List all reviews
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAdminReviewList'
+          description: ''
+  /api/admin/reviews/{id}/moderate/:
+    patch:
+      operationId: admin_reviews_moderate_partial_update
+      description: Moderate (verify / unverify / delete) a review
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/admin/sessions/:
+    get:
+      operationId: admin_sessions_list
+      description: List all rental sessions
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAdminSessionList'
+          description: ''
+  /api/admin/sessions/{id}/:
+    get:
+      operationId: admin_sessions_retrieve
+      description: Get, update, or terminate session as admin
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSession'
+          description: ''
+    put:
+      operationId: admin_sessions_update
+      description: Get, update, or terminate session as admin
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminSession'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AdminSession'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AdminSession'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSession'
+          description: ''
+    patch:
+      operationId: admin_sessions_partial_update
+      description: Get, update, or terminate session as admin
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminSession'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminSession'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminSession'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminSession'
+          description: ''
+    delete:
+      operationId: admin_sessions_destroy
+      description: Get, update, or terminate session as admin
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/admin/settings/:
+    get:
+      operationId: admin_settings_list
+      description: List and create system settings
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSystemSettingList'
+          description: ''
+    post:
+      operationId: admin_settings_create
+      description: List and create system settings
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SystemSetting'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SystemSetting'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SystemSetting'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemSetting'
+          description: ''
+  /api/admin/settings/{key}/:
+    get:
+      operationId: admin_settings_retrieve
+      description: Get, update, delete system setting
+      parameters:
+      - in: path
+        name: key
+        schema:
+          type: string
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemSetting'
+          description: ''
+    put:
+      operationId: admin_settings_update
+      description: Get, update, delete system setting
+      parameters:
+      - in: path
+        name: key
+        schema:
+          type: string
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SystemSetting'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SystemSetting'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SystemSetting'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemSetting'
+          description: ''
+    patch:
+      operationId: admin_settings_partial_update
+      description: Get, update, delete system setting
+      parameters:
+      - in: path
+        name: key
+        schema:
+          type: string
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSystemSetting'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSystemSetting'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSystemSetting'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemSetting'
+          description: ''
+    delete:
+      operationId: admin_settings_destroy
+      description: Get, update, delete system setting
+      parameters:
+      - in: path
+        name: key
+        schema:
+          type: string
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/admin/transactions/:
+    get:
+      operationId: admin_transactions_list
+      description: List all transactions
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAdminTransactionList'
+          description: ''
+  /api/admin/transactions/{id}/:
+    get:
+      operationId: admin_transactions_retrieve
+      description: Get transaction details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminTransaction'
+          description: ''
+  /api/admin/transactions/{id}/refund/:
+    post:
+      operationId: admin_transactions_refund_create
+      description: Process admin refund for a rental payment transaction
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/admin/users/:
+    get:
+      operationId: admin_users_list
+      description: List all users with search and filter
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAdminUserList'
+          description: ''
+  /api/admin/users/{id}/:
+    get:
+      operationId: admin_users_retrieve
+      description: Get, update, or deactivate a user
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUser'
+          description: ''
+    put:
+      operationId: admin_users_update
+      description: Get, update, or deactivate a user
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AdminUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AdminUser'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUser'
+          description: ''
+    patch:
+      operationId: admin_users_partial_update
+      description: Get, update, or deactivate a user
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAdminUser'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminUser'
+          description: ''
+    delete:
+      operationId: admin_users_destroy
+      description: Get, update, or deactivate a user
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/auth/admin/users/:
+    get:
+      operationId: auth_admin_users_list
+      description: |-
+        List all users (admin only).
+        GET: Get list of all users.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+          description: ''
+  /api/auth/admin/users/{user_id}/:
+    get:
+      operationId: auth_admin_users_retrieve
+      description: |-
+        Get, update, delete user (admin only).
+        GET: Get user details.
+        PATCH: Update user.
+        DELETE: Deactivate user (soft delete).
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: auth_admin_users_partial_update
+      description: |-
+        Get, update, delete user (admin only).
+        GET: Get user details.
+        PATCH: Update user.
+        DELETE: Deactivate user (soft delete).
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: auth_admin_users_destroy
+      description: |-
+        Get, update, delete user (admin only).
+        GET: Get user details.
+        PATCH: Update user.
+        DELETE: Deactivate user (soft delete).
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/auth/change-password/:
+    post:
+      operationId: auth_change_password_create
+      description: |-
+        Change user password endpoint.
+        POST: Change password with old password verification.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChangePassword'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangePassword'
+          description: ''
+  /api/auth/forgot-password/:
+    post:
+      operationId: auth_forgot_password_create
+      description: |-
+        Request password reset endpoint.
+        POST: Send password reset email.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ForgotPassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ForgotPassword'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgotPassword'
+          description: ''
+  /api/auth/host/api-key/:
+    post:
+      operationId: auth_host_api_key_create
+      description: |-
+        Generate host API key endpoint.
+        POST: Generate new API key for host agent.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/host/api-key/validate/:
+    post:
+      operationId: auth_host_api_key_validate_create
+      description: |-
+        Validate host API key endpoint.
+        POST: Validate API key for host agent.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateApiKey'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ValidateApiKey'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ValidateApiKey'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidateApiKey'
+          description: ''
+  /api/auth/host/heartbeat/:
+    post:
+      operationId: auth_host_heartbeat_create
+      description: |-
+        Host heartbeat endpoint.
+        POST: Update host heartbeat and status.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/host/profile/:
+    get:
+      operationId: auth_host_profile_retrieve
+      description: |-
+        Get and update host profile.
+        GET: Get host profile.
+        PATCH/PUT: Update host profile.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HostProfile'
+          description: ''
+    put:
+      operationId: auth_host_profile_update
+      description: |-
+        Get and update host profile.
+        GET: Get host profile.
+        PATCH/PUT: Update host profile.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HostProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HostProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HostProfile'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HostProfile'
+          description: ''
+    patch:
+      operationId: auth_host_profile_partial_update
+      description: |-
+        Get and update host profile.
+        GET: Get host profile.
+        PATCH/PUT: Update host profile.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedHostProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedHostProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedHostProfile'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HostProfile'
+          description: ''
+  /api/auth/host/status/:
+    get:
+      operationId: auth_host_status_retrieve
+      description: |-
+        Host status endpoint.
+        GET: Get host status.
+        POST: Update host online/offline status.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: auth_host_status_create
+      description: |-
+        Host status endpoint.
+        GET: Get host status.
+        POST: Update host online/offline status.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/login/:
+    post:
+      operationId: auth_login_create
+      description: |-
+        User login endpoint.
+        POST: Login and get JWT tokens.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLogin'
+          description: ''
+  /api/auth/logout/:
+    post:
+      operationId: auth_logout_create
+      description: |-
+        User logout endpoint.
+        POST: Blacklist refresh token.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/me/:
+    get:
+      operationId: auth_me_retrieve
+      description: |-
+        Get and update current user profile.
+        GET: Get user profile.
+        PATCH/PUT: Update user profile.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: auth_me_update
+      description: |-
+        Get and update current user profile.
+        GET: Get user profile.
+        PATCH/PUT: Update user profile.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: auth_me_partial_update
+      description: |-
+        Get and update current user profile.
+        GET: Get user profile.
+        PATCH/PUT: Update user profile.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/auth/refresh/:
+    post:
+      operationId: auth_refresh_create
+      description: |-
+        Refresh access token endpoint.
+        POST: Get new access token using refresh token.
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/auth/register/:
+    post:
+      operationId: auth_register_create
+      description: |-
+        User registration endpoint.
+        POST: Register a new user.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistration'
+          description: ''
+  /api/auth/reset-password/:
+    post:
+      operationId: auth_reset_password_create
+      description: |-
+        Reset password endpoint.
+        POST: Reset password using token.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetPassword'
+          description: ''
+  /api/dashboard/activity/:
+    get:
+      operationId: dashboard_activity_list
+      description: |-
+        GET: List recent user activity logs.
+        - Regular users see only their own activity.
+        - Admins can view platform-wide logs and filter by user, action, or date range.
+      parameters:
+      - in: query
+        name: action
+        schema:
+          type: string
+        description: Filter by action type
+      - in: query
+        name: end_date
+        schema:
+          type: string
+          format: date
+        description: End date (YYYY-MM-DD)
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: start_date
+        schema:
+          type: string
+          format: date
+        description: Start date (YYYY-MM-DD)
+      - in: query
+        name: user_id
+        schema:
+          type: string
+          format: uuid
+        description: Filter by User ID (Admin only)
+      tags:
+      - dashboard
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserActivityLogList'
+          description: ''
+  /api/dashboard/analytics/:
+    get:
+      operationId: dashboard_analytics_retrieve
+      description: 'GET: Retrieve platform-wide analytics with date and period filters
+        (Admin only).'
+      parameters:
+      - in: query
+        name: end_date
+        schema:
+          type: string
+          format: date
+        description: End date (YYYY-MM-DD)
+      - in: query
+        name: period
+        schema:
+          type: string
+        description: 'Grouping period: day, week, month'
+      - in: query
+        name: start_date
+        schema:
+          type: string
+          format: date
+        description: Start date (YYYY-MM-DD)
+      tags:
+      - dashboard
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformAnalyticsResponse'
+          description: ''
+  /api/dashboard/host/:
+    get:
+      operationId: dashboard_host_retrieve
+      description: 'GET: Host-specific dashboard with GPU stats, session stats, earnings
+        trend.'
+      tags:
+      - dashboard
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/dashboard/renter/:
+    get:
+      operationId: dashboard_renter_retrieve
+      description: 'GET: Renter-specific dashboard with wallet, session history, spending
+        stats.'
+      tags:
+      - dashboard
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/dashboard/revenue/:
+    get:
+      operationId: dashboard_revenue_retrieve
+      description: 'GET: Retrieve detailed revenue breakdown by day/week/month (Admin
+        only).'
+      parameters:
+      - in: query
+        name: end_date
+        schema:
+          type: string
+          format: date
+        description: End date (YYYY-MM-DD)
+      - in: query
+        name: period
+        schema:
+          type: string
+        description: 'Grouping period: day, week, month'
+      - in: query
+        name: start_date
+        schema:
+          type: string
+          format: date
+        description: Start date (YYYY-MM-DD)
+      tags:
+      - dashboard
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevenueAnalyticsResponse'
+          description: ''
+  /api/dashboard/summary/:
+    get:
+      operationId: dashboard_summary_retrieve
+      description: |-
+        GET: Retrieve unified role-aware dashboard summary.
+        - Renters see wallet balance, active sessions, recent sessions, total spent.
+        - Hosts see total earnings, active sessions, GPUs, uptime, recent sessions.
+        - Admins see platform stats (users, hosts, revenue, sessions).
+      tags:
+      - dashboard
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardSummary'
+          description: ''
+  /api/dashboard/widgets/:
+    get:
+      operationId: dashboard_widgets_list
+      description: |-
+        GET: List active user dashboard widgets.
+        POST: Create a new custom widget for the user.
+      tags:
+      - dashboard
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DashboardWidget'
+          description: ''
+    post:
+      operationId: dashboard_widgets_create
+      description: |-
+        GET: List active user dashboard widgets.
+        POST: Create a new custom widget for the user.
+      tags:
+      - dashboard
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardWidget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DashboardWidget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DashboardWidget'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardWidget'
+          description: ''
+  /api/dashboard/widgets/{widget_id}/:
+    get:
+      operationId: dashboard_widgets_retrieve
+      description: 'GET, PATCH, PUT, DELETE: Manage individual user dashboard widget.'
+      parameters:
+      - in: path
+        name: widget_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - dashboard
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardWidget'
+          description: ''
+    put:
+      operationId: dashboard_widgets_update
+      description: 'GET, PATCH, PUT, DELETE: Manage individual user dashboard widget.'
+      parameters:
+      - in: path
+        name: widget_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - dashboard
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardWidget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DashboardWidget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DashboardWidget'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardWidget'
+          description: ''
+    patch:
+      operationId: dashboard_widgets_partial_update
+      description: 'GET, PATCH, PUT, DELETE: Manage individual user dashboard widget.'
+      parameters:
+      - in: path
+        name: widget_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - dashboard
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDashboardWidget'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDashboardWidget'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDashboardWidget'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardWidget'
+          description: ''
+    delete:
+      operationId: dashboard_widgets_destroy
+      description: 'GET, PATCH, PUT, DELETE: Manage individual user dashboard widget.'
+      parameters:
+      - in: path
+        name: widget_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - dashboard
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/gpus/:
+    get:
+      operationId: gpus_list
+      description: List all GPUs with filters
+      parameters:
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - gpus
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GPU'
+          description: ''
+  /api/gpus/{id}/:
+    get:
+      operationId: gpus_retrieve
+      description: Get GPU details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - gpus
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPU'
+          description: ''
+  /api/gpus/available/:
+    get:
+      operationId: gpus_available_list
+      description: List only available GPUs
+      tags:
+      - gpus
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GPU'
+          description: ''
+  /api/gpus/host/:
+    get:
+      operationId: gpus_host_list
+      description: List all GPUs for the current host
+      tags:
+      - gpus
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GPU'
+          description: ''
+  /api/gpus/host/{id}/availability/:
+    put:
+      operationId: gpus_host_availability_update
+      description: Toggle GPU availability
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - gpus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GPUAvailability'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GPUAvailability'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GPUAvailability'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPUAvailability'
+          description: ''
+    patch:
+      operationId: gpus_host_availability_partial_update
+      description: Toggle GPU availability
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - gpus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedGPUAvailability'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedGPUAvailability'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedGPUAvailability'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPUAvailability'
+          description: ''
+  /api/gpus/host/{id}/delete/:
+    delete:
+      operationId: gpus_host_delete_destroy
+      description: Delete/remove a GPU
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - gpus
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/gpus/host/{id}/price/:
+    put:
+      operationId: gpus_host_price_update
+      description: Update GPU price
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - gpus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GPUPrice'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GPUPrice'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GPUPrice'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPUPrice'
+          description: ''
+    patch:
+      operationId: gpus_host_price_partial_update
+      description: Update GPU price
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - gpus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedGPUPrice'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedGPUPrice'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedGPUPrice'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPUPrice'
+          description: ''
+  /api/gpus/host/{id}/stats/:
+    get:
+      operationId: gpus_host_stats_retrieve_2
+      description: Get GPU statistics for host
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - gpus
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPUStats'
+          description: ''
+  /api/gpus/host/{id}/update/:
+    put:
+      operationId: gpus_host_update_update
+      description: Update GPU details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - gpus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GPUUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GPUUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GPUUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPUUpdate'
+          description: ''
+    patch:
+      operationId: gpus_host_update_partial_update
+      description: Update GPU details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - gpus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedGPUUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedGPUUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedGPUUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPUUpdate'
+          description: ''
+  /api/gpus/host/create/:
+    post:
+      operationId: gpus_host_create_create
+      description: Register a new GPU
+      tags:
+      - gpus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GPUCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/GPUCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GPUCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GPUCreate'
+          description: ''
+  /api/gpus/host/stats/:
+    get:
+      operationId: gpus_host_stats_retrieve
+      description: Get aggregated GPU stats for a host
+      tags:
+      - gpus
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/gpus/stats/:
+    get:
+      operationId: gpus_stats_retrieve
+      description: Get marketplace statistics
+      tags:
+      - gpus
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/host/activity/:
+    get:
+      operationId: host_activity_retrieve
+      description: Recent chronological activity feed for host
+      tags:
+      - host
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/host/auto-accept/:
+    post:
+      operationId: host_auto_accept_create
+      description: Quick toggle or set auto-accept state for the host
+      tags:
+      - host
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/host/dashboard/:
+    get:
+      operationId: host_dashboard_retrieve
+      description: Get comprehensive host dashboard data and metrics
+      tags:
+      - host
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/host/earnings/:
+    get:
+      operationId: host_earnings_retrieve
+      description: Get host earnings history and breakdown
+      tags:
+      - host
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/host/earnings/summary/:
+    get:
+      operationId: host_earnings_summary_retrieve
+      description: Get detailed time-series earnings summary (daily/weekly/monthly)
+      tags:
+      - host
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/host/penalties/:
+    get:
+      operationId: host_penalties_retrieve
+      description: Get host penalty history, reliability score, and appeal statuses
+      tags:
+      - host
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/host/penalties/{penalty_id}/appeal/:
+    post:
+      operationId: host_penalties_appeal_create
+      description: Submit an appeal for a host penalty
+      parameters:
+      - in: path
+        name: penalty_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - host
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/host/settings/:
+    get:
+      operationId: host_settings_retrieve
+      description: Get and update host operational settings and preferences
+      tags:
+      - host
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: host_settings_partial_update
+      description: Get and update host operational settings and preferences
+      tags:
+      - host
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/notifications/:
+    get:
+      operationId: notifications_list
+      description: List all notifications for current user
+      tags:
+      - notifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/notifications/{notification_id}/delete/:
+    delete:
+      operationId: notifications_delete_destroy
+      description: Delete a notification
+      parameters:
+      - in: path
+        name: notification_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - notifications
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/notifications/{notification_id}/read/:
+    patch:
+      operationId: notifications_read_partial_update
+      description: Mark a notification as read
+      parameters:
+      - in: path
+        name: notification_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - notifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/notifications/delete-all/:
+    delete:
+      operationId: notifications_delete_all_destroy
+      description: Delete all notifications for user
+      tags:
+      - notifications
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/notifications/read-all/:
+    post:
+      operationId: notifications_read_all_create
+      description: Mark all notifications as read
+      tags:
+      - notifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/notifications/unread/:
+    get:
+      operationId: notifications_unread_retrieve
+      description: Get unread notification count
+      tags:
+      - notifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/reviews/:
+    get:
+      operationId: reviews_list
+      description: |-
+        GET: List reviews with filtering and pagination (Public / Authenticated).
+        POST: Create a review for a completed session (Authenticated Renters).
+      parameters:
+      - in: query
+        name: gpu_id
+        schema:
+          type: string
+          format: uuid
+        description: Filter by GPU ID
+      - in: query
+        name: host_id
+        schema:
+          type: string
+          format: uuid
+        description: Filter by Host ID
+      - in: query
+        name: is_verified
+        schema:
+          type: boolean
+        description: Filter by verified status
+      - in: query
+        name: min_rating
+        schema:
+          type: integer
+        description: Filter by minimum rating (1-5)
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: rating
+        schema:
+          type: integer
+        description: Filter by exact rating (1-5)
+      - in: query
+        name: search
+        schema:
+          type: string
+        description: Search comment or GPU name
+      - in: query
+        name: sort_by
+        schema:
+          type: string
+        description: 'Sort options: newest, oldest, highest_rating, lowest_rating'
+      tags:
+      - reviews
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReviewDetailList'
+          description: ''
+    post:
+      operationId: reviews_create
+      description: |-
+        GET: List reviews with filtering and pagination (Public / Authenticated).
+        POST: Create a review for a completed session (Authenticated Renters).
+      tags:
+      - reviews
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReviewCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReviewCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewCreate'
+          description: ''
+  /api/reviews/{review_id}/:
+    get:
+      operationId: reviews_retrieve
+      description: |-
+        GET: View single review details.
+        PATCH/PUT: Update review ratings or comment (Review Author only).
+        DELETE: Delete review (Review Author or Admin only).
+      parameters:
+      - in: path
+        name: review_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - reviews
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewDetail'
+          description: ''
+    put:
+      operationId: reviews_update
+      description: |-
+        GET: View single review details.
+        PATCH/PUT: Update review ratings or comment (Review Author only).
+        DELETE: Delete review (Review Author or Admin only).
+      parameters:
+      - in: path
+        name: review_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - reviews
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReviewUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReviewUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewUpdate'
+          description: ''
+    patch:
+      operationId: reviews_partial_update
+      description: |-
+        GET: View single review details.
+        PATCH/PUT: Update review ratings or comment (Review Author only).
+        DELETE: Delete review (Review Author or Admin only).
+      parameters:
+      - in: path
+        name: review_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - reviews
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedReviewUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedReviewUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedReviewUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewUpdate'
+          description: ''
+    delete:
+      operationId: reviews_destroy
+      description: |-
+        GET: View single review details.
+        PATCH/PUT: Update review ratings or comment (Review Author only).
+        DELETE: Delete review (Review Author or Admin only).
+      parameters:
+      - in: path
+        name: review_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - reviews
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/reviews/{review_id}/respond/:
+    post:
+      operationId: reviews_respond_create
+      description: 'POST: Allows the host of a reviewed session to reply to the review.'
+      parameters:
+      - in: path
+        name: review_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - reviews
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/reviews/can-review/{session_id}/:
+    get:
+      operationId: reviews_can_review_retrieve
+      description: 'GET: Check if the logged-in user is eligible to review a given
+        session.'
+      parameters:
+      - in: path
+        name: session_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - reviews
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/reviews/host/my-reviews/:
+    get:
+      operationId: reviews_host_my_reviews_list
+      description: 'GET: List reviews received by the current logged-in host.'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - reviews
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReviewDetailList'
+          description: ''
+  /api/reviews/host/my-summary/:
+    get:
+      operationId: reviews_host_my_summary_retrieve
+      description: 'GET: Rating summary and distribution for current logged-in host.'
+      tags:
+      - reviews
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewSummary'
+          description: ''
+  /api/reviews/my-reviews/:
+    get:
+      operationId: reviews_my_reviews_list
+      description: 'GET: List reviews written by the current logged-in renter.'
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - reviews
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReviewDetailList'
+          description: ''
+  /api/reviews/summary/gpu/{gpu_id}/:
+    get:
+      operationId: reviews_summary_gpu_retrieve
+      description: 'GET: Get rating summaries and distribution for a specific GPU.'
+      parameters:
+      - in: path
+        name: gpu_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - reviews
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewSummary'
+          description: ''
+  /api/reviews/summary/host/{host_id}/:
+    get:
+      operationId: reviews_summary_host_retrieve
+      description: 'GET: Get rating summaries and distribution for a specific host.'
+      parameters:
+      - in: path
+        name: host_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - reviews
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewSummary'
+          description: ''
+  /api/sessions/:
+    get:
+      operationId: sessions_list
+      description: List all sessions for the current user
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Session'
+          description: ''
+  /api/sessions/{session_id}/:
+    get:
+      operationId: sessions_retrieve
+      description: Get session details
+      parameters:
+      - in: path
+        name: session_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+          description: ''
+  /api/sessions/{session_id}/commands/:
+    get:
+      operationId: sessions_commands_retrieve
+      description: Host checks for commands
+      parameters:
+      - in: path
+        name: session_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/sessions/{session_id}/heartbeat/:
+    post:
+      operationId: sessions_heartbeat_create
+      description: Host sends heartbeat for active session
+      parameters:
+      - in: path
+        name: session_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/sessions/{session_id}/status/:
+    get:
+      operationId: sessions_status_retrieve
+      description: Get session status
+      parameters:
+      - in: path
+        name: session_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/sessions/{session_id}/status-update/:
+    patch:
+      operationId: sessions_status_update_partial_update
+      description: Host updates session status
+      parameters:
+      - in: path
+        name: session_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/sessions/{session_id}/stop/:
+    post:
+      operationId: sessions_stop_create
+      description: Renter stops a session
+      parameters:
+      - in: path
+        name: session_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/sessions/create/:
+    post:
+      operationId: sessions_create_create
+      description: Renter creates a new session
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/sessions/host/activity/:
+    get:
+      operationId: sessions_host_activity_retrieve
+      description: Recent chronological activity feed for host
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/sessions/host/auto-accept/:
+    post:
+      operationId: sessions_host_auto_accept_create
+      description: Quick toggle or set auto-accept state for the host
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/sessions/host/dashboard/:
+    get:
+      operationId: sessions_host_dashboard_retrieve
+      description: Get comprehensive host dashboard data and metrics
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/sessions/host/earnings/:
+    get:
+      operationId: sessions_host_earnings_retrieve
+      description: Get host earnings history and breakdown
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/sessions/host/earnings/summary/:
+    get:
+      operationId: sessions_host_earnings_summary_retrieve
+      description: Get detailed time-series earnings summary (daily/weekly/monthly)
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/sessions/host/penalties/:
+    get:
+      operationId: sessions_host_penalties_retrieve
+      description: Get host penalty history, reliability score, and appeal statuses
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/sessions/host/penalties/{penalty_id}/appeal/:
+    post:
+      operationId: sessions_host_penalties_appeal_create
+      description: Submit an appeal for a host penalty
+      parameters:
+      - in: path
+        name: penalty_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/sessions/host/pending/:
+    get:
+      operationId: sessions_host_pending_retrieve
+      description: Host polls for pending sessions
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/sessions/host/settings/:
+    get:
+      operationId: sessions_host_settings_retrieve
+      description: Get and update host operational settings and preferences
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: sessions_host_settings_partial_update
+      description: Get and update host operational settings and preferences
+      tags:
+      - sessions
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/wallets/:
+    get:
+      operationId: wallets_retrieve
+      description: Get user wallet
+      tags:
+      - wallets
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Wallet'
+          description: ''
+  /api/wallets/balance/:
+    get:
+      operationId: wallets_balance_retrieve
+      description: Get wallet balance summary
+      tags:
+      - wallets
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/wallets/deposit/:
+    post:
+      operationId: wallets_deposit_create
+      description: Deposit funds into wallet via Stripe or direct provider
+      tags:
+      - wallets
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/wallets/deposit/confirm/:
+    post:
+      operationId: wallets_deposit_confirm_create
+      description: Confirm a completed Stripe payment intent and credit wallet
+      tags:
+      - wallets
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/wallets/transactions/:
+    get:
+      operationId: wallets_transactions_list
+      description: List user transactions with filters
+      tags:
+      - wallets
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+          description: ''
+  /api/wallets/transactions/{id}/:
+    get:
+      operationId: wallets_transactions_retrieve
+      description: Get transaction details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - wallets
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+          description: ''
+  /api/wallets/webhook/stripe/:
+    post:
+      operationId: wallets_webhook_stripe_create
+      description: Receive and process Stripe Webhooks
+      tags:
+      - wallets
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/wallets/withdraw/:
+    post:
+      operationId: wallets_withdraw_create
+      description: Withdraw funds from wallet
+      tags:
+      - wallets
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    AdminGPU:
+      type: object
+      description: GPU serializer for admin
+      properties:
+        id:
+          type: string
+          format: uuid
+        host:
+          type: string
+          format: uuid
+        host_email:
+          type: string
+          format: email
+          readOnly: true
+        gpu_name:
+          type: string
+          description: e.g., NVIDIA RTX 4090
+          maxLength: 255
+        vram_gb:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: VRAM in GB, e.g., 24
+        price_per_hour:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Price in NPR per hour
+        is_available:
+          type: boolean
+        total_rental_hours:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        total_earnings:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        total_sessions:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - gpu_name
+      - host
+      - host_email
+      - price_per_hour
+      - updated_at
+      - vram_gb
+    AdminHost:
+      type: object
+      description: Host serializer for admin
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+        user_email:
+          type: string
+          format: email
+          readOnly: true
+        user_name:
+          type: string
+          readOnly: true
+        gpu_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        vram_total:
+          type: string
+          nullable: true
+          maxLength: 50
+        status:
+          $ref: '#/components/schemas/Status6d0Enum'
+        uptime_percentage:
+          type: number
+          format: double
+        reliability_score:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        total_sessions:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        penalty_points:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        total_earnings:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        pending_payout:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        total_gpus:
+          type: string
+          readOnly: true
+        active_gpus:
+          type: string
+          readOnly: true
+        active_sessions:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - active_gpus
+      - active_sessions
+      - created_at
+      - id
+      - total_gpus
+      - updated_at
+      - user
+      - user_email
+      - user_name
+    AdminReview:
+      type: object
+      description: Review serializer for admin
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        renter:
+          type: string
+          format: uuid
+          description: Renter who authored this review
+        renter_email:
+          type: string
+          format: email
+          readOnly: true
+        host:
+          type: string
+          format: uuid
+          description: Host profile being reviewed
+        host_email:
+          type: string
+          format: email
+          readOnly: true
+        gpu:
+          type: string
+          format: uuid
+          description: GPU used during the session
+        gpu_name:
+          type: string
+          readOnly: true
+        rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          description: Overall rating (1-5 stars)
+        communication_rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          description: How responsive was the host? (1-5 stars)
+        reliability_rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          description: Did the host stay online and maintain stable service? (1-5
+            stars)
+        gpu_performance_rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          description: Was the GPU fast and performing as expected? (1-5 stars)
+        comment:
+          type: string
+          description: Detailed feedback from the renter
+        is_verified:
+          type: boolean
+          description: Indicates review is from a verified completed rental session
+        host_response:
+          type: string
+          nullable: true
+          description: Optional response from the host
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - gpu
+      - gpu_name
+      - host
+      - host_email
+      - id
+      - rating
+      - renter
+      - renter_email
+      - updated_at
+    AdminSession:
+      type: object
+      description: Session serializer for admin
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        renter:
+          type: string
+          format: uuid
+        renter_email:
+          type: string
+          format: email
+          readOnly: true
+        host:
+          type: string
+          format: uuid
+        host_email:
+          type: string
+          format: email
+          readOnly: true
+        gpu:
+          type: string
+          format: uuid
+        gpu_name:
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/Status5deEnum'
+        duration:
+          type: string
+          readOnly: true
+        start_time:
+          type: string
+          format: date-time
+          readOnly: true
+        active_time:
+          type: string
+          format: date-time
+          nullable: true
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+        total_amount:
+          type: number
+          format: double
+        actual_cost:
+          type: number
+          format: double
+          nullable: true
+        refund_amount:
+          type: number
+          format: double
+        platform_fee:
+          type: number
+          format: double
+        termination_reason:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/TerminationReasonEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        error_message:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - duration
+      - gpu
+      - gpu_name
+      - host
+      - host_email
+      - id
+      - renter
+      - renter_email
+      - start_time
+      - updated_at
+    AdminTransaction:
+      type: object
+      description: Transaction serializer for admin
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+        user_email:
+          type: string
+          format: email
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/Type909Enum'
+        status:
+          $ref: '#/components/schemas/StatusAa4Enum'
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        description:
+          type: string
+          nullable: true
+        session_id:
+          type: string
+          format: uuid
+          nullable: true
+        reference_id:
+          type: string
+          nullable: true
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - amount
+      - created_at
+      - id
+      - type
+      - user
+      - user_email
+    AdminUser:
+      type: object
+      description: User serializer for admin
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        first_name:
+          type: string
+          maxLength: 100
+        last_name:
+          type: string
+          maxLength: 100
+        full_name:
+          type: string
+          readOnly: true
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        is_active:
+          type: boolean
+        is_email_verified:
+          type: boolean
+        is_staff:
+          type: boolean
+        is_superuser:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          nullable: true
+        wallet_balance:
+          type: string
+          readOnly: true
+        total_sessions:
+          type: string
+          readOnly: true
+        total_spent:
+          type: string
+          readOnly: true
+        is_host:
+          type: boolean
+          readOnly: true
+      required:
+      - created_at
+      - email
+      - full_name
+      - id
+      - is_host
+      - total_sessions
+      - total_spent
+      - wallet_balance
+    BlankEnum:
+      enum:
+      - ''
+    ChangePassword:
+      type: object
+      properties:
+        old_password:
+          type: string
+        new_password:
+          type: string
+        confirm_password:
+          type: string
+      required:
+      - confirm_password
+      - new_password
+      - old_password
+    CurrencyEnum:
+      enum:
+      - NPR
+      - USD
+      type: string
+      description: |-
+        * `NPR` - Nepalese Rupee
+        * `USD` - US Dollar
+    DashboardSummary:
+      type: object
+      description: Generic or role-based dashboard summary response serializer
+      properties:
+        role:
+          type: string
+      required:
+      - role
+    DashboardWidget:
+      type: object
+      description: Serializer for DashboardWidget model
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        widget_type:
+          $ref: '#/components/schemas/WidgetTypeEnum'
+        position:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        settings: {}
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - updated_at
+      - widget_type
+    ForgotPassword:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    GPU:
+      type: object
+      description: Serializer for Gpu Model
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        host:
+          type: string
+          format: uuid
+          readOnly: true
+        host_name:
+          type: string
+          readOnly: true
+        host_uptime:
+          type: number
+          format: double
+          readOnly: true
+        host_reliability:
+          type: integer
+          readOnly: true
+        gpu_name:
+          type: string
+          description: e.g., NVIDIA RTX 4090
+          maxLength: 255
+        vram_total:
+          type: string
+          description: e.g., 24576 MiB
+          maxLength: 50
+        vram_gb:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: VRAM in GB, e.g., 24
+        cuda_cores:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        memory_bandwidth:
+          type: string
+          nullable: true
+          maxLength: 50
+        compute_capability:
+          type: string
+          nullable: true
+          maxLength: 10
+        driver_version:
+          type: string
+          nullable: true
+          maxLength: 50
+        cuda_version:
+          type: string
+          nullable: true
+          maxLength: 50
+        price_per_hour:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Price in NPR per hour
+        is_available:
+          type: boolean
+        is_rentable:
+          type: boolean
+          readOnly: true
+        location:
+          type: string
+          nullable: true
+          maxLength: 255
+        total_rental_hours:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        total_earnings:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        total_sessions:
+          type: integer
+          readOnly: true
+        average_rating:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - average_rating
+      - created_at
+      - gpu_name
+      - host
+      - host_name
+      - host_reliability
+      - host_uptime
+      - id
+      - is_rentable
+      - price_per_hour
+      - total_earnings
+      - total_rental_hours
+      - total_sessions
+      - updated_at
+      - vram_gb
+      - vram_total
+    GPUAvailability:
+      type: object
+      description: Serializer for toggling GPU availability
+      properties:
+        is_available:
+          type: boolean
+    GPUCreate:
+      type: object
+      description: Serializer for creating a GPU
+      properties:
+        gpu_name:
+          type: string
+          description: e.g., NVIDIA RTX 4090
+          maxLength: 255
+        vram_total:
+          type: string
+          description: e.g., 24576 MiB
+          maxLength: 50
+        vram_gb:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: VRAM in GB, e.g., 24
+        cuda_cores:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        memory_bandwidth:
+          type: string
+          nullable: true
+          maxLength: 50
+        compute_capability:
+          type: string
+          nullable: true
+          maxLength: 10
+        driver_version:
+          type: string
+          nullable: true
+          maxLength: 50
+        cuda_version:
+          type: string
+          nullable: true
+          maxLength: 50
+        price_per_hour:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Price in NPR per hour
+        location:
+          type: string
+          nullable: true
+          maxLength: 255
+      required:
+      - gpu_name
+      - price_per_hour
+      - vram_gb
+      - vram_total
+    GPUPrice:
+      type: object
+      description: Serializer for updating GPU Price
+      properties:
+        price_per_hour:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Price in NPR per hour
+      required:
+      - price_per_hour
+    GPUStats:
+      type: object
+      description: Serializer for GPU statistics
+      properties:
+        total_rental_hours:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        total_earnings:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        total_sessions:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        is_available:
+          type: boolean
+    GPUUpdate:
+      type: object
+      description: Serializer for updating a GPU
+      properties:
+        gpu_name:
+          type: string
+          description: e.g., NVIDIA RTX 4090
+          maxLength: 255
+        vram_total:
+          type: string
+          description: e.g., 24576 MiB
+          maxLength: 50
+        vram_gb:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: VRAM in GB, e.g., 24
+        cuda_cores:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        memory_bandwidth:
+          type: string
+          nullable: true
+          maxLength: 50
+        compute_capability:
+          type: string
+          nullable: true
+          maxLength: 10
+        driver_version:
+          type: string
+          nullable: true
+          maxLength: 50
+        cuda_version:
+          type: string
+          nullable: true
+          maxLength: 50
+        price_per_hour:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Price in NPR per hour
+        location:
+          type: string
+          nullable: true
+          maxLength: 255
+    HostProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        user_id:
+          type: string
+          format: uuid
+          writeOnly: true
+        gpu_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        vram_total:
+          type: string
+          nullable: true
+          maxLength: 50
+        vram_gb:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        driver_version:
+          type: string
+          nullable: true
+          maxLength: 50
+        cuda_version:
+          type: string
+          nullable: true
+          maxLength: 50
+        os_version:
+          type: string
+          nullable: true
+          maxLength: 100
+        status:
+          $ref: '#/components/schemas/Status6d0Enum'
+        uptime_percentage:
+          type: number
+          format: double
+          readOnly: true
+        reliability_score:
+          type: integer
+          readOnly: true
+        total_sessions:
+          type: integer
+          readOnly: true
+        penalty_points:
+          type: integer
+          readOnly: true
+        total_earnings:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        pending_payout:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        total_rental_hours:
+          type: number
+          format: double
+          readOnly: true
+        auto_accept:
+          type: boolean
+        max_rental_hours:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        notification_preferences: {}
+        availability_schedule: {}
+        location:
+          type: string
+          nullable: true
+          maxLength: 255
+        internet_type:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/InternetTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        last_heartbeat:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        offline_since:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        heartbeat_count:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - heartbeat_count
+      - id
+      - last_heartbeat
+      - offline_since
+      - penalty_points
+      - pending_payout
+      - reliability_score
+      - total_earnings
+      - total_rental_hours
+      - total_sessions
+      - updated_at
+      - uptime_percentage
+      - user
+    InternetTypeEnum:
+      enum:
+      - home
+      - datacenter
+      - mobile
+      - office
+      type: string
+      description: |-
+        * `home` - Home
+        * `datacenter` - Datacenter
+        * `mobile` - Mobile
+        * `office` - Office
+    LevelEnum:
+      enum:
+      - info
+      - warning
+      - error
+      - critical
+      type: string
+      description: |-
+        * `info` - Info
+        * `warning` - Warning
+        * `error` - Error
+        * `critical` - Critical
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+          readOnly: true
+        user_email:
+          type: string
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/NotificationTypeEnum'
+        title:
+          type: string
+          maxLength: 255
+        message:
+          type: string
+        data: {}
+        is_read:
+          type: boolean
+        read_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        time_ago:
+          type: string
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - message
+      - read_at
+      - time_ago
+      - title
+      - type
+      - user
+      - user_email
+    NotificationTypeEnum:
+      enum:
+      - session_started
+      - session_ending
+      - session_completed
+      - session_terminated
+      - refund_processed
+      - payment_received
+      - host_offline
+      - new_session_request
+      - wallet_credited
+      - wallet_debited
+      - welcome
+      - system_alert
+      - penalty_applied
+      - review_received
+      - review_response
+      type: string
+      description: |-
+        * `session_started` - Session Started
+        * `session_ending` - Session Ending Soon
+        * `session_completed` - Session Completed
+        * `session_terminated` - Session Terminated
+        * `refund_processed` - Refund Processed
+        * `payment_received` - Payment Received
+        * `host_offline` - Host Offline
+        * `new_session_request` - New Session Request
+        * `wallet_credited` - Wallet Credited
+        * `wallet_debited` - Wallet Debited
+        * `welcome` - Welcome
+        * `system_alert` - System Alert
+        * `penalty_applied` - Penalty Applied
+        * `review_received` - Review Received
+        * `review_response` - Host Responded to Review
+    NullEnum:
+      enum:
+      - null
+    PaginatedAdminGPUList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminGPU'
+    PaginatedAdminHostList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminHost'
+    PaginatedAdminReviewList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminReview'
+    PaginatedAdminSessionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminSession'
+    PaginatedAdminTransactionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminTransaction'
+    PaginatedAdminUserList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminUser'
+    PaginatedReviewDetailList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewDetail'
+    PaginatedSystemLogList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SystemLog'
+    PaginatedSystemSettingList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SystemSetting'
+    PaginatedUserActivityLogList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserActivityLog'
+    PatchedAdminGPU:
+      type: object
+      description: GPU serializer for admin
+      properties:
+        id:
+          type: string
+          format: uuid
+        host:
+          type: string
+          format: uuid
+        host_email:
+          type: string
+          format: email
+          readOnly: true
+        gpu_name:
+          type: string
+          description: e.g., NVIDIA RTX 4090
+          maxLength: 255
+        vram_gb:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: VRAM in GB, e.g., 24
+        price_per_hour:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Price in NPR per hour
+        is_available:
+          type: boolean
+        total_rental_hours:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        total_earnings:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        total_sessions:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedAdminHost:
+      type: object
+      description: Host serializer for admin
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+        user_email:
+          type: string
+          format: email
+          readOnly: true
+        user_name:
+          type: string
+          readOnly: true
+        gpu_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        vram_total:
+          type: string
+          nullable: true
+          maxLength: 50
+        status:
+          $ref: '#/components/schemas/Status6d0Enum'
+        uptime_percentage:
+          type: number
+          format: double
+        reliability_score:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        total_sessions:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        penalty_points:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        total_earnings:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        pending_payout:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        total_gpus:
+          type: string
+          readOnly: true
+        active_gpus:
+          type: string
+          readOnly: true
+        active_sessions:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedAdminSession:
+      type: object
+      description: Session serializer for admin
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        renter:
+          type: string
+          format: uuid
+        renter_email:
+          type: string
+          format: email
+          readOnly: true
+        host:
+          type: string
+          format: uuid
+        host_email:
+          type: string
+          format: email
+          readOnly: true
+        gpu:
+          type: string
+          format: uuid
+        gpu_name:
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/Status5deEnum'
+        duration:
+          type: string
+          readOnly: true
+        start_time:
+          type: string
+          format: date-time
+          readOnly: true
+        active_time:
+          type: string
+          format: date-time
+          nullable: true
+        end_time:
+          type: string
+          format: date-time
+          nullable: true
+        total_amount:
+          type: number
+          format: double
+        actual_cost:
+          type: number
+          format: double
+          nullable: true
+        refund_amount:
+          type: number
+          format: double
+        platform_fee:
+          type: number
+          format: double
+        termination_reason:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/TerminationReasonEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        error_message:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedAdminUser:
+      type: object
+      description: User serializer for admin
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        first_name:
+          type: string
+          maxLength: 100
+        last_name:
+          type: string
+          maxLength: 100
+        full_name:
+          type: string
+          readOnly: true
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        is_active:
+          type: boolean
+        is_email_verified:
+          type: boolean
+        is_staff:
+          type: boolean
+        is_superuser:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          nullable: true
+        wallet_balance:
+          type: string
+          readOnly: true
+        total_sessions:
+          type: string
+          readOnly: true
+        total_spent:
+          type: string
+          readOnly: true
+        is_host:
+          type: boolean
+          readOnly: true
+    PatchedDashboardWidget:
+      type: object
+      description: Serializer for DashboardWidget model
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        widget_type:
+          $ref: '#/components/schemas/WidgetTypeEnum'
+        position:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        settings: {}
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedGPUAvailability:
+      type: object
+      description: Serializer for toggling GPU availability
+      properties:
+        is_available:
+          type: boolean
+    PatchedGPUPrice:
+      type: object
+      description: Serializer for updating GPU Price
+      properties:
+        price_per_hour:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Price in NPR per hour
+    PatchedGPUUpdate:
+      type: object
+      description: Serializer for updating a GPU
+      properties:
+        gpu_name:
+          type: string
+          description: e.g., NVIDIA RTX 4090
+          maxLength: 255
+        vram_total:
+          type: string
+          description: e.g., 24576 MiB
+          maxLength: 50
+        vram_gb:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          description: VRAM in GB, e.g., 24
+        cuda_cores:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        memory_bandwidth:
+          type: string
+          nullable: true
+          maxLength: 50
+        compute_capability:
+          type: string
+          nullable: true
+          maxLength: 10
+        driver_version:
+          type: string
+          nullable: true
+          maxLength: 50
+        cuda_version:
+          type: string
+          nullable: true
+          maxLength: 50
+        price_per_hour:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          description: Price in NPR per hour
+        location:
+          type: string
+          nullable: true
+          maxLength: 255
+    PatchedHostProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        user_id:
+          type: string
+          format: uuid
+          writeOnly: true
+        gpu_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        vram_total:
+          type: string
+          nullable: true
+          maxLength: 50
+        vram_gb:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+          nullable: true
+        driver_version:
+          type: string
+          nullable: true
+          maxLength: 50
+        cuda_version:
+          type: string
+          nullable: true
+          maxLength: 50
+        os_version:
+          type: string
+          nullable: true
+          maxLength: 100
+        status:
+          $ref: '#/components/schemas/Status6d0Enum'
+        uptime_percentage:
+          type: number
+          format: double
+          readOnly: true
+        reliability_score:
+          type: integer
+          readOnly: true
+        total_sessions:
+          type: integer
+          readOnly: true
+        penalty_points:
+          type: integer
+          readOnly: true
+        total_earnings:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        pending_payout:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        total_rental_hours:
+          type: number
+          format: double
+          readOnly: true
+        auto_accept:
+          type: boolean
+        max_rental_hours:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        notification_preferences: {}
+        availability_schedule: {}
+        location:
+          type: string
+          nullable: true
+          maxLength: 255
+        internet_type:
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/InternetTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        last_heartbeat:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        offline_since:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        heartbeat_count:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedReviewUpdate:
+      type: object
+      description: Serializer for updating an existing review by the author
+      properties:
+        rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          description: Overall rating (1-5 stars)
+        communication_rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          description: How responsive was the host? (1-5 stars)
+        reliability_rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          description: Did the host stay online and maintain stable service? (1-5
+            stars)
+        gpu_performance_rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          description: Was the GPU fast and performing as expected? (1-5 stars)
+        comment:
+          type: string
+          description: Detailed feedback from the renter
+    PatchedSystemSetting:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        key:
+          type: string
+          maxLength: 100
+        value: {}
+        description:
+          type: string
+          nullable: true
+        is_public:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedUser:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        first_name:
+          type: string
+          maxLength: 100
+        last_name:
+          type: string
+          maxLength: 100
+        full_name:
+          type: string
+          readOnly: true
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        is_active:
+          type: boolean
+        is_email_verified:
+          type: boolean
+        wallet_balance:
+          type: string
+          readOnly: true
+        is_host:
+          type: string
+          readOnly: true
+        is_renter:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PlatformAnalyticsResponse:
+      type: object
+      properties:
+        overview:
+          $ref: '#/components/schemas/PlatformOverview'
+        timeline:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlatformTimelineItem'
+      required:
+      - overview
+      - timeline
+    PlatformOverview:
+      type: object
+      properties:
+        total_users:
+          type: integer
+        total_hosts:
+          type: integer
+        total_gpus:
+          type: integer
+        total_sessions:
+          type: integer
+        active_sessions:
+          type: integer
+        total_revenue:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        platform_fees:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        start_date:
+          type: string
+        end_date:
+          type: string
+        period:
+          type: string
+      required:
+      - active_sessions
+      - end_date
+      - period
+      - platform_fees
+      - start_date
+      - total_gpus
+      - total_hosts
+      - total_revenue
+      - total_sessions
+      - total_users
+    PlatformTimelineItem:
+      type: object
+      properties:
+        date:
+          type: string
+        total_users:
+          type: integer
+        total_hosts:
+          type: integer
+        total_gpus:
+          type: integer
+        total_sessions:
+          type: integer
+        active_sessions:
+          type: integer
+        total_revenue:
+          type: number
+          format: double
+        platform_fees:
+          type: number
+          format: double
+        new_users:
+          type: integer
+        new_hosts:
+          type: integer
+        new_sessions:
+          type: integer
+      required:
+      - active_sessions
+      - date
+      - new_hosts
+      - new_sessions
+      - new_users
+      - platform_fees
+      - total_gpus
+      - total_hosts
+      - total_revenue
+      - total_sessions
+      - total_users
+    RatingDistribution:
+      type: object
+      properties:
+        five_star:
+          $ref: '#/components/schemas/RatingStarBucket'
+        four_star:
+          $ref: '#/components/schemas/RatingStarBucket'
+        three_star:
+          $ref: '#/components/schemas/RatingStarBucket'
+        two_star:
+          $ref: '#/components/schemas/RatingStarBucket'
+        one_star:
+          $ref: '#/components/schemas/RatingStarBucket'
+      required:
+      - five_star
+      - four_star
+      - one_star
+      - three_star
+      - two_star
+    RatingStarBucket:
+      type: object
+      properties:
+        count:
+          type: integer
+        percentage:
+          type: number
+          format: double
+      required:
+      - count
+      - percentage
+    ResetPassword:
+      type: object
+      properties:
+        token:
+          type: string
+        new_password:
+          type: string
+        confirm_password:
+          type: string
+      required:
+      - confirm_password
+      - new_password
+      - token
+    RevenueAnalyticsResponse:
+      type: object
+      properties:
+        summary:
+          $ref: '#/components/schemas/RevenueSummary'
+        timeline:
+          type: array
+          items:
+            $ref: '#/components/schemas/RevenueTimelineItem'
+      required:
+      - summary
+      - timeline
+    RevenueSummary:
+      type: object
+      properties:
+        start_date:
+          type: string
+        end_date:
+          type: string
+        period:
+          type: string
+        gross_revenue:
+          type: number
+          format: double
+        platform_fees:
+          type: number
+          format: double
+        host_net_earnings:
+          type: number
+          format: double
+        total_refunds:
+          type: number
+          format: double
+        completed_rentals:
+          type: integer
+      required:
+      - completed_rentals
+      - end_date
+      - gross_revenue
+      - host_net_earnings
+      - period
+      - platform_fees
+      - start_date
+      - total_refunds
+    RevenueTimelineItem:
+      type: object
+      properties:
+        period:
+          type: string
+        gross_revenue:
+          type: number
+          format: double
+        platform_fees:
+          type: number
+          format: double
+        host_net_earnings:
+          type: number
+          format: double
+        sessions_count:
+          type: integer
+      required:
+      - gross_revenue
+      - host_net_earnings
+      - period
+      - platform_fees
+      - sessions_count
+    ReviewCreate:
+      type: object
+      description: Serializer for creating a new review after session completion
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        session_id:
+          type: string
+          format: uuid
+          writeOnly: true
+        rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          description: Overall rating (1-5 stars)
+        communication_rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          description: How responsive was the host? (1-5 stars)
+        reliability_rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          description: Did the host stay online and maintain stable service? (1-5
+            stars)
+        gpu_performance_rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          description: Was the GPU fast and performing as expected? (1-5 stars)
+        comment:
+          type: string
+          description: Detailed feedback from the renter
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - rating
+      - session_id
+    ReviewDetail:
+      type: object
+      description: Detailed serializer for viewing reviews
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        session_id:
+          type: string
+          format: uuid
+          readOnly: true
+        renter_id:
+          type: string
+          format: uuid
+          readOnly: true
+        renter_name:
+          type: string
+          readOnly: true
+        host_id:
+          type: string
+          format: uuid
+          readOnly: true
+        host_name:
+          type: string
+          readOnly: true
+        gpu_id:
+          type: string
+          format: uuid
+          readOnly: true
+        gpu_name:
+          type: string
+          readOnly: true
+        rating:
+          type: integer
+          readOnly: true
+          description: Overall rating (1-5 stars)
+        communication_rating:
+          type: integer
+          readOnly: true
+          description: How responsive was the host? (1-5 stars)
+        reliability_rating:
+          type: integer
+          readOnly: true
+          description: Did the host stay online and maintain stable service? (1-5
+            stars)
+        gpu_performance_rating:
+          type: integer
+          readOnly: true
+          description: Was the GPU fast and performing as expected? (1-5 stars)
+        comment:
+          type: string
+          readOnly: true
+          description: Detailed feedback from the renter
+        is_verified:
+          type: boolean
+          readOnly: true
+          description: Indicates review is from a verified completed rental session
+        host_response:
+          type: string
+          readOnly: true
+          nullable: true
+          description: Optional response from the host
+        host_responded_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: Timestamp when host responded
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - comment
+      - communication_rating
+      - created_at
+      - gpu_id
+      - gpu_name
+      - gpu_performance_rating
+      - host_id
+      - host_name
+      - host_responded_at
+      - host_response
+      - id
+      - is_verified
+      - rating
+      - reliability_rating
+      - renter_id
+      - renter_name
+      - session_id
+      - updated_at
+    ReviewSummary:
+      type: object
+      properties:
+        average_rating:
+          type: number
+          format: double
+        average_communication:
+          type: number
+          format: double
+        average_reliability:
+          type: number
+          format: double
+        average_gpu_performance:
+          type: number
+          format: double
+        total_reviews:
+          type: integer
+        verified_reviews_count:
+          type: integer
+        rating_distribution:
+          $ref: '#/components/schemas/RatingDistribution'
+      required:
+      - average_communication
+      - average_gpu_performance
+      - average_rating
+      - average_reliability
+      - rating_distribution
+      - total_reviews
+      - verified_reviews_count
+    ReviewUpdate:
+      type: object
+      description: Serializer for updating an existing review by the author
+      properties:
+        rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          description: Overall rating (1-5 stars)
+        communication_rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          description: How responsive was the host? (1-5 stars)
+        reliability_rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          description: Did the host stay online and maintain stable service? (1-5
+            stars)
+        gpu_performance_rating:
+          type: integer
+          maximum: 5
+          minimum: 1
+          description: Was the GPU fast and performing as expected? (1-5 stars)
+        comment:
+          type: string
+          description: Detailed feedback from the renter
+      required:
+      - rating
+    RoleEnum:
+      enum:
+      - renter
+      - host
+      - both
+      - admin
+      type: string
+      description: |-
+        * `renter` - Renter
+        * `host` - Host
+        * `both` - Both
+        * `admin` - Admin
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        gpu:
+          type: string
+          format: uuid
+        gpu_name:
+          type: string
+          readOnly: true
+        host:
+          type: string
+          format: uuid
+        host_name:
+          type: string
+          readOnly: true
+        renter:
+          type: string
+          format: uuid
+        renter_name:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status5deEnum'
+          readOnly: true
+        relay_server_ip:
+          type: string
+          readOnly: true
+          nullable: true
+        relay_server_port:
+          type: integer
+          readOnly: true
+          nullable: true
+        ssh_connection_string:
+          type: string
+          readOnly: true
+          nullable: true
+        start_time:
+          type: string
+          format: date-time
+          readOnly: true
+        active_time:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        end_time:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        duration_hours:
+          type: number
+          format: double
+          readOnly: true
+        total_amount:
+          type: number
+          format: double
+          readOnly: true
+        actual_cost:
+          type: number
+          format: double
+          readOnly: true
+          nullable: true
+        refund_amount:
+          type: number
+          format: double
+          readOnly: true
+        compensation_amount:
+          type: number
+          format: double
+          readOnly: true
+        platform_fee:
+          type: number
+          format: double
+          readOnly: true
+        work_protection_enabled:
+          type: boolean
+          readOnly: true
+        progress_percentage:
+          type: number
+          format: double
+          readOnly: true
+        work_lost:
+          type: boolean
+          readOnly: true
+        termination_reason:
+          readOnly: true
+          nullable: true
+          oneOf:
+          - $ref: '#/components/schemas/TerminationReasonEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        error_message:
+          type: string
+          readOnly: true
+          nullable: true
+        last_heartbeat:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        heartbeat_count:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        cost_so_far:
+          type: number
+          format: double
+          readOnly: true
+      required:
+      - active_time
+      - actual_cost
+      - compensation_amount
+      - cost_so_far
+      - created_at
+      - duration_hours
+      - end_time
+      - error_message
+      - gpu
+      - gpu_name
+      - heartbeat_count
+      - host
+      - host_name
+      - id
+      - last_heartbeat
+      - platform_fee
+      - progress_percentage
+      - refund_amount
+      - relay_server_ip
+      - relay_server_port
+      - renter
+      - renter_name
+      - ssh_connection_string
+      - start_time
+      - status
+      - termination_reason
+      - total_amount
+      - updated_at
+      - work_lost
+      - work_protection_enabled
+    Status5deEnum:
+      enum:
+      - pending
+      - starting
+      - container_running
+      - tunnel_connecting
+      - active
+      - stopping
+      - completed
+      - terminated
+      - failed
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `starting` - Starting
+        * `container_running` - Container Running
+        * `tunnel_connecting` - Tunnel Connecting
+        * `active` - Active
+        * `stopping` - Stopping
+        * `completed` - Completed
+        * `terminated` - Terminated
+        * `failed` - Failed
+    Status6d0Enum:
+      enum:
+      - online
+      - offline
+      - restricted
+      - suspended
+      type: string
+      description: |-
+        * `online` - Online
+        * `offline` - Offline
+        * `restricted` - Restricted
+        * `suspended` - Suspended
+    StatusAa4Enum:
+      enum:
+      - pending
+      - completed
+      - failed
+      - cancelled
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `completed` - Completed
+        * `failed` - Failed
+        * `cancelled` - Cancelled
+    SystemLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        level:
+          $ref: '#/components/schemas/LevelEnum'
+        source:
+          type: string
+          maxLength: 100
+        message:
+          type: string
+        details: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - message
+      - source
+    SystemSetting:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        key:
+          type: string
+          maxLength: 100
+        value: {}
+        description:
+          type: string
+          nullable: true
+        is_public:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - key
+      - updated_at
+      - value
+    TerminationReasonEnum:
+      enum:
+      - host_offline
+      - renter_stopped
+      - completed
+      - failed
+      - host_rejected
+      - idle_timeout
+      - admin_cancelled
+      type: string
+      description: |-
+        * `host_offline` - Host Offline
+        * `renter_stopped` - Renter Stopped
+        * `completed` - Completed
+        * `failed` - Failed
+        * `host_rejected` - Host Rejected
+        * `idle_timeout` - Idle Timeout
+        * `admin_cancelled` - Admin Cancelled
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+          readOnly: true
+        user_email:
+          type: string
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/Type909Enum'
+        status:
+          $ref: '#/components/schemas/StatusAa4Enum'
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        description:
+          type: string
+          nullable: true
+        session_id:
+          type: string
+          format: uuid
+          nullable: true
+        reference_id:
+          type: string
+          nullable: true
+          maxLength: 255
+        metadata: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        completed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - completed_at
+      - created_at
+      - id
+      - type
+      - updated_at
+      - user
+      - user_email
+    Type909Enum:
+      enum:
+      - deposit
+      - withdrawal
+      - rental_payment
+      - host_earning
+      - refund
+      - compensation
+      - platform_fee
+      - hold
+      - release_hold
+      type: string
+      description: |-
+        * `deposit` - Deposit
+        * `withdrawal` - Withdrawal
+        * `rental_payment` - Rental Payment
+        * `host_earning` - Host Earning
+        * `refund` - Refund
+        * `compensation` - Compensation
+        * `platform_fee` - Platform Fee
+        * `hold` - Hold
+        * `release_hold` - Release Hold
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        first_name:
+          type: string
+          maxLength: 100
+        last_name:
+          type: string
+          maxLength: 100
+        full_name:
+          type: string
+          readOnly: true
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        is_active:
+          type: boolean
+        is_email_verified:
+          type: boolean
+        wallet_balance:
+          type: string
+          readOnly: true
+        is_host:
+          type: string
+          readOnly: true
+        is_renter:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - email
+      - full_name
+      - id
+      - is_host
+      - is_renter
+      - wallet_balance
+    UserActivityLog:
+      type: object
+      description: Serializer for UserActivityLog model
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        user_email:
+          type: string
+          readOnly: true
+          default: Anonymous
+        action:
+          type: string
+          readOnly: true
+        details:
+          readOnly: true
+        ip_address:
+          type: string
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - created_at
+      - details
+      - id
+      - ip_address
+      - user
+      - user_email
+    UserLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password
+    UserRegistration:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        first_name:
+          type: string
+          maxLength: 100
+        last_name:
+          type: string
+          maxLength: 100
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        password:
+          type: string
+          writeOnly: true
+        password2:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - id
+      - password
+      - password2
+    ValidateApiKey:
+      type: object
+      properties:
+        api_key:
+          type: string
+      required:
+      - api_key
+    Wallet:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+          readOnly: true
+        user_email:
+          type: string
+          readOnly: true
+        balance:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        hold_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        available_balance:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        currency:
+          $ref: '#/components/schemas/CurrencyEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - available_balance
+      - created_at
+      - id
+      - updated_at
+      - user
+      - user_email
+    WidgetTypeEnum:
+      enum:
+      - sessions
+      - earnings
+      - gpus
+      - reviews
+      - wallet
+      - activity
+      - system_metrics
+      - platform_stats
+      type: string
+      description: |-
+        * `sessions` - Session Overview
+        * `earnings` - Earnings & Revenue
+        * `gpus` - GPU Inventory
+        * `reviews` - Ratings & Reviews
+        * `wallet` - Wallet & Balance
+        * `activity` - Recent Activity
+        * `system_metrics` - System Performance
+        * `platform_stats` - Platform Overview
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

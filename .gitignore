@@ -28,6 +28,7 @@ logs/
 
 # Miscellaneous
 scratch/
+SSH-Based GPU Resource Provisioning API.yaml
 
 # Python Build and Cache
 __pycache__/
